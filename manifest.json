@@ -1,0 +1,17 @@
+{
+  "name": "ТК СМР",
+  "short_name": "ТК СМР",
+  "description": "Дашборд выполнения СМР по книге «Тепловая карта»",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#173a63",
+  "theme_color": "#173a63",
+  "lang": "ru",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
