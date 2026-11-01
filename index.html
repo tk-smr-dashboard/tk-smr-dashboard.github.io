@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<title>ТК СМР</title>
+<title>ТК СМР β</title>
 <meta name="apple-mobile-web-app-title" content="ТК СМР">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -479,6 +479,63 @@ th.sorted .sar{opacity:1;color:var(--org)}
   .viewsel .pkbtn{flex:0 0 auto}
   #drop{min-height:60vh;margin:14px;padding:24px}
 }
+/* ---------- сторис на «Обзоре» (как в Telegram) ---------- */
+.stories{display:flex;gap:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  padding:6px 4px 14px;margin:0 -4px 6px}
+.stories::-webkit-scrollbar{display:none}
+.st{flex:0 0 auto;width:74px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;
+  padding:0;font:inherit;cursor:pointer;transition:transform .12s ease}
+.st:active{transform:scale(.94)}
+.st-ring{display:block;width:70px;height:70px;border-radius:50%;padding:3px;background:conic-gradient(from 200deg,#ed7d31,#e2462f,#b12e7a,#3a6fd8,#2fb3c6,#ed7d31)}
+.st.seen .st-ring{background:#c3ccd6}
+.st-in{display:block;width:100%;height:100%;border-radius:50%;padding:3px;background:var(--bg)}
+.st-av{width:100%;height:100%;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
+.st-av svg{width:26px;height:26px}
+.st-av b{font-size:16px;font-weight:800;letter-spacing:-.3px}
+.st span{font-size:11.5px;font-weight:600;color:var(--ink2);max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st.seen span{color:var(--dim)}
+:root[data-theme="dark"] .st.seen .st-ring{background:#3a4454}
+/* полноэкранный просмотр */
+.sv{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;color:#fff;
+  padding:calc(10px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom));
+  background:var(--sv-bg,#173a63);opacity:0;visibility:hidden;transform:scale(.96);
+  transition:opacity .28s ease,transform .32s cubic-bezier(.32,.72,0,1),visibility 0s linear .32s;
+  -webkit-user-select:none;user-select:none;touch-action:none}
+.sv.on{opacity:1;visibility:visible;transform:translateY(var(--dy,0px)) scale(1);transition:opacity .28s ease,transform .38s cubic-bezier(.32,.72,0,1),visibility 0s}
+.sv.drag{transition:none}
+.sv::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(80% 50% at 85% 0%,rgba(255,255,255,.16),transparent 60%),radial-gradient(70% 45% at 0% 100%,rgba(0,0,0,.25),transparent 60%)}
+.sv>*{position:relative}
+.sv-bars{display:flex;gap:4px;margin-bottom:10px}
+.sv-bars i{flex:1;height:3px;border-radius:2px;background:rgba(255,255,255,.3);overflow:hidden;position:relative}
+.sv-bars i b{position:absolute;left:0;top:0;bottom:0;width:0;background:#fff;border-radius:2px}
+.sv-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.sv-ava{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.18);box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.6)}
+.sv-ava svg{width:18px;height:18px}
+.sv-ttl{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.sv-ttl b{font-size:15px}
+.sv-ttl span{font-size:11.5px;opacity:.75}
+.sv-x{width:34px;height:34px;border-radius:50%;border:0;background:rgba(255,255,255,.16);color:#fff;font-size:17px;cursor:pointer}
+.sv-slide{flex:1;display:flex;flex-direction:column;justify-content:center;max-width:560px;width:100%;margin:0 auto;padding:10px 4px}
+.sv-slide.in{animation:svIn .45s cubic-bezier(.32,.72,0,1)}
+@keyframes svIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.sv-k{font-size:12px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.sv-big{font-size:clamp(46px,15vw,76px);font-weight:800;letter-spacing:-1.5px;line-height:1;font-variant-numeric:tabular-nums}
+.sv-sub{font-size:16px;line-height:1.45;opacity:.9;margin-top:10px}
+.sv-sub b{font-weight:800}
+.sv-list{display:flex;flex-direction:column;gap:8px;margin-top:20px}
+.sv-it{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:16px;
+  background:rgba(255,255,255,.13);box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+  -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.sv-it .n{flex:0 0 22px;font-size:13px;font-weight:800;opacity:.6}
+.sv-it .t{flex:1;min-width:0}
+.sv-it .t b{display:block;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-it .t span{display:block;font-size:12px;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sv-it .v{flex:0 0 auto;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
+.sv-hint{text-align:center;font-size:11px;opacity:.5}
+html.sv-open,html.sv-open body{overflow:hidden}
 /* ---------- карточка позиции: панель снизу, как в «Погоде» на iPhone ---------- */
 .sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;transition:opacity .5s ease}
 .sheet-bg.on{opacity:1;pointer-events:auto}
@@ -719,8 +776,7 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 
   <!-- ОБЗОР -->
   <div class="pane" id="pane-obzor">
-    <div class="kpis" id="kpis"></div>
-    <div class="carousel-dots" id="kpisDots"></div>
+    <div class="stories" id="stories"></div>
     <div class="card">
       <h2>Готовность по видам работ <small>свайп по карточкам · стрелка — % готовности, синяя точка на дуге — план</small></h2>
       <div class="kpis" id="viewGauges"></div>
@@ -830,6 +886,16 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 
 </main>
 
+<div class="sv" id="storyView" aria-hidden="true">
+  <div class="sv-bars" id="svBars"></div>
+  <div class="sv-top">
+    <span class="sv-ava" id="svAva"></span>
+    <div class="sv-ttl"><b id="svTitle"></b><span id="svPer"></span></div>
+    <button class="sv-x" id="svClose" aria-label="Закрыть">✕</button>
+  </div>
+  <div class="sv-slide" id="svSlide"></div>
+  <div class="sv-hint">нажмите справа — дальше, слева — назад, удерживайте — пауза</div>
+</div>
 <div class="sheet-bg" id="sheetBg"></div>
 <div class="sheet" id="posSheet" role="dialog" aria-modal="true" aria-hidden="true">
   <div class="sheet-grab" id="sheetGrab"><i></i></div>
@@ -1419,6 +1485,278 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   }
 
   /* ================= ОБЗОР ================= */
+  /* ================= СТОРИС ================= */
+  var ST_ICONS = {
+    sum: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.2 15.9A10 10 0 1 1 8 2.8"/><path d="M22 12A10 10 0 0 0 12 2v10z"/></svg>',
+    lead: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+    lag: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h16.9a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    pace: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>',
+    done: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.1V12a10 10 0 1 1-5.9-9.1"/><polyline points="22 4 12 14 9 11"/></svg>',
+    stop: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="10" y1="15" x2="10" y2="9"/><line x1="14" y1="15" x2="14" y2="9"/></svg>',
+    rd: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="13" y2="17"/></svg>'
+  };
+  var ST_BG = {
+    sum: ['#1f4e8c', '#173a63'], lead: ['#1e8a57', '#0f4f33'], lag: ['#c0473b', '#6e1f1a'], pace: ['#7a4fd1', '#3b2470'],
+    done: ['#1a9aa8', '#0d5560'], stop: ['#c98a1c', '#6b4708'], rd: ['#3d5a80', '#1f2f45']
+  };
+  var STORIES = [], svState = null;
+  function stSeenKey() { return 'tk_story_seen|' + state.pk + '|' + C.dkey(state.from) + '|' + C.dkey(state.to); }
+  function stSeen() { try { return JSON.parse(localStorage.getItem(stSeenKey()) || '{}'); } catch (e) { return {}; } }
+  function stMarkSeen(id) { try { var m = stSeen(); m[id] = 1; localStorage.setItem(stSeenKey(), JSON.stringify(m)); } catch (e) { } }
+  function pp(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v * 100).toFixed(1).replace('.0', '') + ' п.п.'; }
+
+  function buildStories() {
+    var T = C.sliceTotals(S, state.pk);
+    var rows = S.rows.filter(function (r) { return state.pk === C.PK_ALL || r.pk === state.pk; });
+    var V = M.views, out = [];
+    var per = C.fmtD(state.from) + ' → ' + C.fmtD(state.to);
+
+    /* 1. Итоги */
+    var withVol = 0, sR = 0, sR0 = 0, lag = 0, moved = 0, p = 0, f = 0, worst = null;
+    T.forEach(function (t, i) {
+      if (!(t.tot > 0)) return;
+      withVol++; sR += t.fakt / t.tot; sR0 += (t.fakt - t.dFakt) / t.tot;
+      p += t.plan / t.tot; f += t.fakt / t.tot;
+      if (t.dFakt > 0) moved++;
+      if (t.fakt < t.plan - 1e-9) { lag++; var k = t.plan ? t.fakt / t.plan : 0; if (!worst || k < worst.k) worst = { i: i, k: k }; }
+    });
+    var ready = withVol ? sR / withVol : 0, ready0 = withVol ? sR0 / withVol : 0, exec = p ? f / p : 0;
+    out.push({ id: 'sum', title: 'Итоги', label: pf(ready), slides: [
+      { k: 'Готовность по видам работ', big: pf(ready), sub: 'на ' + C.fmtD(state.to) + ' · среднее по ' + withVol + ' видам<br>за период <b>' + pp(ready - ready0) + '</b>' },
+      { k: 'Выполнение плана', big: pf(exec), sub: exec >= 0.999 ? 'план выполняется' : 'ниже плана на <b>' + pf(1 - exec) + '</b>',
+        list: [
+          { t: 'Видов с отставанием', s: worst ? 'худший — ' + V[worst.i].short : 'отставаний нет', v: lag + ' / ' + withVol },
+          { t: 'Видов с движением', s: 'за ' + per, v: moved + ' / ' + withVol }
+        ] }
+    ] });
+
+    /* 2. Лидеры */
+    var pos = rows.map(function (r) {
+      var sc = 0, best = null;
+      r.v.forEach(function (c, i) {
+        if (!(c.tot > 0) || !(c.dFakt > 0)) return;
+        var rel = c.dFakt / c.tot; sc += rel;
+        if (!best || rel > best.rel) best = { i: i, rel: rel, d: c.dFakt };
+      });
+      return { r: r, sc: sc, best: best };
+    }).filter(function (x) { return x.sc > 0; }).sort(function (a, b) { return b.sc - a.sc; });
+    var vLead = T.map(function (t, i) { return { i: i, t: t, rel: t.tot ? t.dFakt / t.tot : 0 }; })
+      .filter(function (x) { return x.t.dFakt > 0; }).sort(function (a, b) { return b.rel - a.rel; });
+    if (pos.length) {
+      out.push({ id: 'lead', title: 'Лидеры', label: 'Лидеры', slides: [
+        { k: 'Где работали больше всего', big: pos.length, sub: 'позиций с приростом за период', list: pos.slice(0, 5).map(function (x) {
+          var v = V[x.best.i];
+          return { t: x.r.pos, s: v.short + ': +' + nf(x.best.d) + ' ' + v.unit, v: '+' + pf(x.best.rel) };
+        }) },
+        { k: 'Виды работ с наибольшим приростом', big: vLead.length ? '+' + pf(vLead[0].rel) : '—', sub: vLead.length ? V[vLead[0].i].short + ' — лучший прирост от объёма' : '',
+          list: vLead.slice(0, 5).map(function (x) { var v = V[x.i]; return { t: v.short, s: '+' + nf(x.t.dFakt) + ' ' + v.unit, v: '+' + pf(x.rel) }; }) }
+      ] });
+    }
+
+    /* 3. Отставания */
+    var vLag = T.map(function (t, i) { return { i: i, t: t, k: t.plan ? t.fakt / t.plan : 1 }; })
+      .filter(function (x) { return x.t.tot > 0 && x.t.fakt < x.t.plan - 1e-9; }).sort(function (a, b) { return a.k - b.k; });
+    var pLag = rows.map(function (r) {
+      var def = 0, w = null;
+      r.v.forEach(function (c, i) {
+        if (!(c.tot > 0) || !(c.plan > c.fakt)) return;
+        var d = (c.plan - c.fakt) / c.tot; def += d;
+        if (!w || d > w.d) w = { i: i, d: d, abs: c.plan - c.fakt };
+      });
+      return { r: r, def: def, w: w };
+    }).filter(function (x) { return x.def > 0; }).sort(function (a, b) { return b.def - a.def; });
+    if (vLag.length || pLag.length) {
+      var sl = [];
+      if (vLag.length) sl.push({ k: 'Виды работ ниже плана', big: vLag.length, sub: 'сильнее всего отстаёт <b>' + V[vLag[0].i].short + '</b> — ' + pf(vLag[0].k) + ' плана',
+        list: vLag.slice(0, 5).map(function (x) { var v = V[x.i]; return { t: v.short, s: 'дефицит ' + nf(x.t.plan - x.t.fakt) + ' ' + v.unit, v: pf(x.k) }; }) });
+      if (pLag.length) sl.push({ k: 'Позиции с наибольшим отставанием', big: pLag.length, sub: 'позиций не дотягивают до плана',
+        list: pLag.slice(0, 5).map(function (x) { var v = V[x.w.i]; return { t: x.r.pos, s: v.short + ': −' + nf(x.w.abs) + ' ' + v.unit, v: '−' + pf(x.w.d) }; }) });
+      out.push({ id: 'lag', title: 'Отставания', label: 'Отставания', slides: sl });
+    }
+
+    /* 4. Темп относительно прошлого такого же периода */
+    var hd = M.histDates.map(C.dkey), iF = hd.indexOf(C.dkey(state.from)), iT = hd.indexOf(C.dkey(state.to));
+    if (iF > 0 && iT > iF && iF - (iT - iF) >= 0) {
+      var Sp = C.sliceAt(M, hd[iF - (iT - iF)], hd[iF]), Tp = C.sliceTotals(Sp, state.pk);
+      var now = 0, prev = 0, n = 0, diff = [];
+      T.forEach(function (t, i) {
+        if (!(t.tot > 0)) return;
+        var a = t.dFakt / t.tot, b = Tp[i].dFakt / t.tot; now += a; prev += b; n++;
+        if (Math.abs(a - b) > 1e-6) diff.push({ i: i, a: a, b: b, d: a - b });
+      });
+      if (n && (now > 0 || prev > 0)) {
+        var ratio = prev > 0 ? now / prev - 1 : null;
+        diff.sort(function (x, y) { return y.d - x.d; });
+        var up = diff.filter(function (x) { return x.d > 0; }), dn = diff.filter(function (x) { return x.d < 0; }).reverse();
+        var fmtR = function (x) { return (x.a * 100).toFixed(1) + '% vs ' + (x.b * 100).toFixed(1) + '% объёма'; };
+        var sl2 = [{ k: 'Темп к прошлому периоду', big: ratio === null ? 'старт' : (ratio >= 0 ? '+' : '−') + Math.abs(ratio * 100).toFixed(0) + '%',
+          sub: 'сделано <b>' + (now / n * 100).toFixed(1) + '%</b> объёма в среднем по виду<br>в прошлом периоде — ' + (prev / n * 100).toFixed(1) + '%' }];
+        if (up.length) sl2.push({ k: 'Ускорились', big: up.length, sub: 'видов работ идут быстрее', list: up.slice(0, 5).map(function (x) { return { t: V[x.i].short, s: fmtR(x), v: '▲' }; }) });
+        if (dn.length) sl2.push({ k: 'Замедлились', big: dn.length, sub: 'видов работ идут медленнее', list: dn.slice(0, 5).map(function (x) { return { t: V[x.i].short, s: fmtR(x), v: '▼' }; }) });
+        out.push({ id: 'pace', title: 'Темп', label: 'Темп', slides: sl2 });
+      }
+    }
+
+    /* 5. Завершено за период */
+    var done = [];
+    rows.forEach(function (r) { r.v.forEach(function (c, i) {
+      if (c.tot > 0 && c.fakt >= c.tot - 1e-9 && c.fakt - c.dFakt < c.tot - 1e-9) done.push({ r: r, i: i, c: c });
+    }); });
+    if (done.length) {
+      var byPos = {};
+      done.forEach(function (x) { byPos[x.r.pos] = 1; });
+      out.push({ id: 'done', title: 'Завершено', label: 'Завершено', slides: [
+        { k: 'Дошли до 100% за период', big: done.length, sub: 'работ завершено на <b>' + Object.keys(byPos).length + '</b> позициях',
+          list: done.slice(0, 6).map(function (x) { var v = V[x.i]; return { t: x.r.pos, s: v.short + ' · ' + nf(x.c.tot) + ' ' + v.unit, v: '100%' }; }) }
+      ] });
+    }
+
+    /* 6. Застой: отстаёт от плана и не двигалось */
+    var stall = [];
+    rows.forEach(function (r) { r.v.forEach(function (c, i) {
+      if (c.tot > 0 && c.plan > c.fakt + 1e-9 && Math.abs(c.dFakt) < 1e-9) stall.push({ r: r, i: i, c: c, d: (c.plan - c.fakt) / c.tot });
+    }); });
+    if (stall.length) {
+      stall.sort(function (a, b) { return b.d - a.d; });
+      out.push({ id: 'stop', title: 'Застой', label: 'Застой', slides: [
+        { k: 'Отстаёт от плана и стоит на месте', big: stall.length, sub: 'позиций × видов работ без прироста за период',
+          list: stall.slice(0, 6).map(function (x) { var v = V[x.i]; return { t: x.r.pos, s: v.short + ': дефицит ' + nf(x.c.plan - x.c.fakt) + ' ' + v.unit, v: pf(x.c.fakt / x.c.tot) }; }) }
+      ] });
+    }
+
+    /* 7. Объёмы по РД */
+    if (M.histTot) {
+      var keys = Object.keys(M.histTot).sort(), at = function (k) { var r = null; keys.forEach(function (x) { if (x <= k) r = x; }); return r; };
+      var kB = at(C.dkey(state.to)), kA = at(C.dkey(state.from));
+      if (kA && kB && kA < kB) {
+        var hA = M.histTot[kA], hB = M.histTot[kB], ch = [], posC = {};
+        Object.keys(hB).forEach(function (key) {
+          if (state.pk !== C.PK_ALL && key.split('‖')[0] !== state.pk) return;
+          var a = hA[key] || [], b = hB[key];
+          V.forEach(function (v, i) { var d = (b[i] || 0) - (a[i] || 0); if (Math.abs(d) > 1e-9) { ch.push({ key: key, i: i, d: d, a: a[i] || 0 }); posC[key] = 1; } });
+        });
+        if (ch.length) {
+          ch.sort(function (x, y) { return Math.abs(y.d) - Math.abs(x.d); });
+          out.push({ id: 'rd', title: 'Объёмы РД', label: 'Объёмы РД', slides: [
+            { k: 'Изменились объёмы по РД', big: Object.keys(posC).length, sub: 'позиций · <b>' + ch.length + '</b> изменений с ' + C.fmtD(new Date(kA)),
+              list: ch.slice(0, 6).map(function (x) { var v = V[x.i]; return { t: x.key.split('‖')[1], s: v.short + ': ' + nf(x.a) + ' → ' + nf(x.a + x.d) + ' ' + v.unit, v: sgn(x.d) }; }) }
+          ] });
+        }
+      }
+    }
+    return out;
+  }
+
+  function renderStories() {
+    STORIES = buildStories();
+    var seen = stSeen();
+    $('#stories').innerHTML = STORIES.map(function (st, i) {
+      var c = ST_BG[st.id];
+      return '<button class="st' + (seen[st.id] ? ' seen' : '') + '" data-i="' + i + '"><span class="st-ring"><span class="st-in">' +
+        '<span class="st-av" style="background:linear-gradient(145deg,' + c[0] + ',' + c[1] + ')">' + (st.id === 'sum' ? '<b>' + st.label + '</b>' : ST_ICONS[st.id]) + '</span>' +
+        '</span></span><span>' + esc(st.title) + '</span></button>';
+    }).join('');
+    $$('#stories .st').forEach(function (b) { b.onclick = function () { openStory(+b.dataset.i, 0); }; });
+  }
+
+  var SV_MS = 6500;
+  function openStory(si, sl) {
+    var st = STORIES[si]; if (!st) return closeStory();
+    var c = ST_BG[st.id], v = $('#storyView');
+    v.style.setProperty('--sv-bg', 'linear-gradient(165deg,' + c[0] + ' 0%,' + c[1] + ' 100%)');
+    $('#svAva').innerHTML = ST_ICONS[st.id];
+    $('#svTitle').textContent = st.title;
+    $('#svPer').textContent = C.fmtD(state.from) + ' → ' + C.fmtD(state.to) + (state.pk === C.PK_ALL ? '' : ' · ' + state.pk);
+    $('#svBars').innerHTML = st.slides.map(function () { return '<i><b></b></i>'; }).join('');
+    svState = { si: si, sl: sl, t0: 0, el: 0, paused: false };
+    stMarkSeen(st.id);
+    var btn = $('#stories .st[data-i="' + si + '"]'); if (btn) btn.classList.add('seen');
+    if (!v.classList.contains('on')) {
+      v.style.removeProperty('--dy'); v.setAttribute('aria-hidden', 'false');
+      document.documentElement.classList.add('sv-open');
+      requestAnimationFrame(function () { v.classList.add('on'); });
+    }
+    showSlide();
+  }
+  function showSlide() {
+    var st = STORIES[svState.si], s = st.slides[svState.sl], box = $('#svSlide');
+    box.innerHTML = '<div class="sv-k">' + esc(s.k) + '</div><div class="sv-big">' + s.big + '</div>' +
+      (s.sub ? '<div class="sv-sub">' + s.sub + '</div>' : '') +
+      (s.list && s.list.length ? '<div class="sv-list">' + s.list.map(function (it, i) {
+        return '<div class="sv-it"><span class="n">' + (i + 1) + '</span><span class="t"><b>' + esc(it.t) + '</b>' +
+          (it.s ? '<span>' + esc(it.s) + '</span>' : '') + '</span><span class="v">' + esc(String(it.v)) + '</span></div>';
+      }).join('') + '</div>' : '');
+    box.classList.remove('in'); void box.offsetWidth; box.classList.add('in');
+    $$('#svBars i b').forEach(function (b, i) { b.style.width = i < svState.sl ? '100%' : '0'; });
+    svState.el = 0; svState.t0 = performance.now();
+    tickStory();
+  }
+  function tickStory() {
+    if (!svState) return;
+    cancelAnimationFrame(svState.raf);
+    svState.raf = requestAnimationFrame(function step(now) {
+      if (!svState) return;
+      var el = svState.paused ? svState.el : svState.el + (now - svState.t0);
+      var bar = $$('#svBars i b')[svState.sl];
+      if (bar) bar.style.width = Math.min(100, el / SV_MS * 100) + '%';
+      if (el >= SV_MS) return nextSlide();
+      svState.raf = requestAnimationFrame(step);
+    });
+  }
+  function pauseStory(on) {
+    if (!svState || svState.paused === on) return;
+    var now = performance.now();
+    if (on) { svState.el += now - svState.t0; } else { svState.t0 = now; }
+    svState.paused = on;
+  }
+  function nextSlide() {
+    var st = STORIES[svState.si];
+    if (svState.sl < st.slides.length - 1) { svState.sl++; showSlide(); }
+    else openStory(svState.si + 1, 0);
+  }
+  function prevSlide() {
+    if (svState.sl > 0) { svState.sl--; showSlide(); }
+    else if (svState.si > 0) openStory(svState.si - 1, 0);
+    else showSlide();
+  }
+  function closeStory() {
+    var v = $('#storyView');
+    if (svState) cancelAnimationFrame(svState.raf);
+    svState = null;
+    v.classList.remove('on', 'drag'); v.style.removeProperty('--dy'); v.setAttribute('aria-hidden', 'true');
+    document.documentElement.classList.remove('sv-open');
+  }
+  (function () {
+    var v = $('#storyView'), x0, y0, t0, dy = 0, pid = null;
+    v.addEventListener('pointerdown', function (e) {
+      if (!svState || e.target.closest('.sv-x')) return;
+      pid = e.pointerId; x0 = e.clientX; y0 = e.clientY; t0 = Date.now(); dy = 0;
+      try { v.setPointerCapture(pid); } catch (x) { }
+      pauseStory(true);
+    });
+    v.addEventListener('pointermove', function (e) {
+      if (e.pointerId !== pid) return;
+      dy = Math.max(0, e.clientY - y0);
+      if (dy > 8) { v.classList.add('drag'); v.style.setProperty('--dy', dy + 'px'); }
+    });
+    function up(e) {
+      if (e.pointerId !== pid) return;
+      pid = null; v.classList.remove('drag');
+      if (dy > 110) return closeStory();
+      v.style.removeProperty('--dy');
+      pauseStory(false);
+      if (dy < 10 && Date.now() - t0 < 280) { if (e.clientX < v.clientWidth * 0.33) prevSlide(); else nextSlide(); }
+    }
+    v.addEventListener('pointerup', up);
+    v.addEventListener('pointercancel', up);
+    $('#svClose').onclick = closeStory;
+    document.addEventListener('keydown', function (e) {
+      if (!svState) return;
+      if (e.key === 'Escape') closeStory(); else if (e.key === 'ArrowRight') nextSlide(); else if (e.key === 'ArrowLeft') prevSlide();
+    });
+    document.addEventListener('visibilitychange', function () { if (svState) pauseStory(document.hidden); });
+  })();
+
   function renderObzor() {
     var T = C.sliceTotals(S, state.pk);
     var withVol = 0, sumReady = 0, lag = 0, lagList = [], moved = 0;
@@ -1438,13 +1776,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       { l: 'Видов с отставанием', v: lag, suf: ' / ' + withVol, s: lag ? 'худший: ' + M.views[lagList[0].i].short : 'отставаний нет', c: lag === 0 ? 'g' : lag <= 3 ? 'y' : 'r' },
       { l: 'Движение за период', v: moved, suf: ' / ' + withVol, s: per, c: moved >= withVol * 0.5 ? 'g' : moved ? 'y' : 'r' }
     ];
-    $('#kpis').innerHTML = kpi.map(function (k) {
-      return '<div class="kpi ' + k.c + '"><div class="kl">' + k.l + '</div>' +
-        '<div class="kv" data-to="' + k.v + '" data-suf="' + (k.suf || '') + '"' + (k.pct ? ' data-pct="1"' : '') + '>—</div>' +
-        '<div class="ks">' + esc(k.s) + '</div></div>';
-    }).join('');
-    animateNumbers($('#kpis'));
-    wireDots($('#kpis'), $('#kpisDots'));
+    void kpi;
+    renderStories();
 
     /* данные строк */
     var data = T.map(function (t, i) {
