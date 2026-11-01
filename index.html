@@ -81,6 +81,8 @@ header{position:sticky;top:0;z-index:36;
 header h1{font-size:32px;font-weight:800;letter-spacing:-.4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;
   transition:font-size .3s ease,opacity .2s ease}
 /* компактная шапка при прокрутке: большой заголовок уходит, по центру — маленький */
+/* «резинка» iPhone: при оттягивании вниз над шапкой открывался светлый фон — продлеваем синий вверх */
+header::before{content:"";position:absolute;left:0;right:0;bottom:100%;height:100vh;background:#173a63;pointer-events:none}
 .hdr-mini{position:absolute;left:90px;right:90px;bottom:0;top:env(safe-area-inset-top);display:flex;align-items:center;
   justify-content:center;font-size:16px;font-weight:700;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;
   opacity:0;transform:translateY(8px);transition:opacity .22s ease,transform .3s ease;pointer-events:none}
@@ -184,7 +186,7 @@ label.chk{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;
 @keyframes secIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .tmach{background:#fff4e2;border-bottom:1px solid #f0d5a8;color:#8a5b12;padding:7px 24px;font-size:12.5px;font-weight:600}
 
-main{padding:20px 24px 60px;max-width:1720px;margin:0 auto}
+main{padding:20px 24px 60px;max-width:1720px;margin:0 auto;min-height:100vh;min-height:100dvh}
 .card{background:
     linear-gradient(170deg,rgba(255,255,255,.55),rgba(255,255,255,.08) 46%),
     var(--glass-bg);
@@ -307,6 +309,7 @@ table.hmap tbody tr td.c,table.hmap tbody tr th.stick{transition:opacity .2s eas
 table.hmap tbody tr.row-dim td.c,table.hmap tbody tr.row-dim th.stick{opacity:.5;filter:saturate(.25) brightness(.93)}
 table.hmap tbody td.c:active,table.hmap tbody th.stick:active{transform:scale(.94)}
 /* ---------- панель деталей выбранной ячейки карты ---------- */
+.cellinfo:empty{display:none}
 .cellinfo{background:var(--blue-l);border:1px solid var(--blue-line);border-radius:12px;padding:12px 14px;margin-bottom:12px}
 .ci-hint{color:var(--dim);font-size:13px}
 .ci-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:9px;padding-bottom:9px;border-bottom:1px solid var(--blue-line)}
@@ -477,14 +480,17 @@ th.sorted .sar{opacity:1;color:var(--org)}
   #drop{min-height:60vh;margin:14px;padding:24px}
 }
 /* ---------- карточка позиции: панель снизу, как в «Погоде» на iPhone ---------- */
-.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;transition:opacity .32s ease}
+.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;transition:opacity .5s ease}
 .sheet-bg.on{opacity:1;pointer-events:auto}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:640px;margin:0 auto;max-height:88vh;max-height:88dvh;
   display:flex;flex-direction:column;border-radius:28px 28px 0 0;
   background:rgba(246,248,251,.9);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
   box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -14px 44px -12px rgba(10,25,45,.38);
-  transform:translateY(105%);transition:transform .4s cubic-bezier(.4,0,.6,1),visibility 0s linear .4s;visibility:hidden}
-.sheet.on{transform:translateY(var(--dy,0px));visibility:visible;transition:transform .45s cubic-bezier(.22,1,.36,1),visibility 0s}
+  transform:translateY(105%);transition:transform .42s cubic-bezier(.4,0,.7,.2),visibility 0s linear .42s;visibility:hidden;will-change:transform}
+.sheet.on{transform:translateY(var(--dy,0px));visibility:visible;transition:transform .62s cubic-bezier(.32,.72,0,1),visibility 0s}
+.sheet.on .sh-head,.sheet.on .sh-tiles,.sheet.on .sh-cap,.sheet.on .sh-item{animation:shIn .5s cubic-bezier(.32,.72,0,1) backwards}
+.sheet.on .sh-tiles{animation-delay:.06s} .sheet.on .sh-cap{animation-delay:.1s}
+@keyframes shIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
 .sheet.drag{transition:none}
 .sheet-grab{flex:0 0 auto;display:flex;justify-content:center;padding:10px 0 4px;cursor:grab;touch-action:none}
 .sheet-grab i{width:40px;height:5px;border-radius:3px;background:rgba(20,40,70,.22)}
@@ -511,13 +517,20 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 .sh-it-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
 .sh-it-top b{font-size:13.5px;color:var(--ink2)}
 .sh-it-top b small{font-size:11px}
-.sh-item .bar{margin-bottom:7px}
+.sh-row{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.sh-bar{position:relative;flex:1;height:8px;border-radius:4px;background:rgba(20,40,70,.09);overflow:hidden}
+.sh-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:4px;background:var(--blue)}
+.sh-bar i.ok{background:var(--green)} .sh-bar i.warn{background:var(--amber)} .sh-bar i.bad{background:var(--red)} .sh-bar i.zero{background:#c7ced6}
+.sh-bar u{position:absolute;top:-1px;bottom:-1px;width:2px;margin-left:-1px;background:var(--navy);opacity:.75;border-radius:1px}
+.sh-pct{flex:0 0 52px;text-align:right;font-size:17px;font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.2px}
 .sh-nums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--dim)}
 .sh-nums b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
 @media(max-width:420px){.sh-tiles{grid-template-columns:repeat(2,1fr)}}
 :root[data-theme="dark"] .sheet{background:rgba(22,28,36,.9);box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 -14px 44px -12px rgba(0,0,0,.6)}
 :root[data-theme="dark"] .sheet-grab i{background:rgba(255,255,255,.28)}
 :root[data-theme="dark"] .sh-x{background:rgba(255,255,255,.1)}
+:root[data-theme="dark"] .sh-bar{background:rgba(255,255,255,.1)}
+:root[data-theme="dark"] .sh-bar u{background:#cfd8e3}
 :root[data-theme="dark"] .sh-tile,:root[data-theme="dark"] .sh-item{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
 /* ---------- планшеты (Android, iPad): сенсорный экран шире телефона — нижняя капсула вместо верхних вкладок ---------- */
 @media (pointer:coarse) and (min-width:641px){
@@ -741,9 +754,9 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
           <button data-mode="phys">Физика</button>
         </div>
       </div>
-      <div class="dim maphint" id="mapHint">в ячейке — % готовности от объёма по РД</div>
+      <div class="dim maphint" id="mapHint">в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку</div>
       <div class="viewsel" id="viewSel"></div>
-      <div class="cellinfo" id="cellInfo"><div class="ci-hint">Нажмите на позицию — откроется карточка по всем видам работ; на ячейку — детали по виду</div></div>
+      <div class="cellinfo" id="cellInfo"></div>
       <div id="mapBox"></div>
       <div class="legend">
         <span><i class="sw" style="background:#bfe3c8"></i>план выполнен</span>
@@ -1346,6 +1359,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     lens.style.setProperty('--x', b.offsetLeft + 'px');
     if (first) { void lens.offsetWidth; lens.style.transition = ''; lens.classList.add('ready'); }
   }
+  function goTab(t) {
+    if (t === state.tab) return;
+    state.tab = t;
+    $('header').classList.remove('compact');
+    window.scrollTo(0, 0);
+    render();
+  }
   function render() {
     $$('.tab').forEach(function (t) { t.classList.toggle('on', t.dataset.tab === state.tab); });
     $$('.pane').forEach(function (p) { p.style.display = p.id === 'pane-' + state.tab ? '' : 'none'; });
@@ -1493,10 +1513,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     }
     if (state.onlyLag) rows = rows.filter(function (r) { return r.v.some(function (c) { return c.tot > 0 && c.fakt < c.plan - 1e-9; }); });
     kartaRows = rows;
-    $('#cellInfo').innerHTML = '<div class="ci-hint">Нажмите на позицию — откроется карточка по всем видам работ; на ячейку — детали по виду</div>';
+    $('#cellInfo').innerHTML = '';
     $('#mapHint').textContent = state.mapMode === 'phys'
-      ? 'в ячейке — факт / план в физических показателях'
-      : 'в ячейке — % готовности от объёма по РД';
+      ? 'в ячейке — факт / план в физ. показателях · нажмите на позицию, чтобы открыть карточку'
+      : 'в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку';
 
     var visIdx = state.viewGroup ? state.viewGroup.idx : M.views.map(function (v, i) { return i; });
     var phys = state.mapMode === 'phys';
@@ -1570,11 +1590,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     if (!items.length) h.push('<div class="empty">По этой позиции нет объёмов ни по одному виду работ.</div>');
     else {
       h.push('<div class="sh-cap">' + (vi >= 0 ? 'Выбранный вид — сверху, далее по выполнению плана' : 'По видам работ · сначала отстающие') + '</div><div class="sh-list">');
-      items.forEach(function (x) {
+      items.forEach(function (x, k) {
         var c = x.c, st = statusOf(c.fakt, c.plan, c.tot), rd = c.fakt / c.tot;
-        h.push('<div class="sh-item' + (x.i === vi ? ' sel' : '') + '"><div class="sh-it-top"><b>' + esc(x.v.short) + ' <small class="dim">' + esc(x.v.unit) + '</small></b>' +
+        h.push('<div class="sh-item' + (x.i === vi ? ' sel' : '') + '" style="animation-delay:' + Math.min(140 + k * 35, 420) + 'ms"><div class="sh-it-top"><b>' + esc(x.v.short) + ' <small class="dim">' + esc(x.v.unit) + '</small></b>' +
           '<span class="pill ' + st + '">' + ST_LABEL[st] + '</span></div>' +
-          '<div class="bar"><i class="' + st + '" style="width:' + Math.min(100, rd * 100) + '%"></i><u style="left:' + Math.min(100, c.plan / c.tot * 100) + '%"></u><span>' + pf(rd) + '</span></div>' +
+          '<div class="sh-row"><div class="sh-bar"><i class="' + st + '" style="width:' + Math.min(100, rd * 100) + '%"></i>' +
+          (c.plan ? '<u style="left:' + Math.min(100, c.plan / c.tot * 100) + '%"></u>' : '') + '</div><span class="sh-pct">' + (rd < 0.0005 ? '0%' : pf(rd)) + '</span></div>' +
           '<div class="sh-nums"><span>Факт <b>' + nf(c.fakt) + '</b></span><span>План <b>' + nf(c.plan) + '</b></span><span>Всего <b>' + nf(c.tot) + '</b></span>' +
           (c.plan ? '<span>Вып. плана <b class="' + (c.fakt >= c.plan - 1e-9 ? 'good' : 'badt') + '">' + pf(c.fakt / c.plan) + '</b></span>' : '') +
           (c.dFakt ? '<span>За период <b class="' + (c.dFakt > 0 ? 'good' : 'badt') + '">' + sgn(c.dFakt) + '</b></span>' : '') + '</div></div>');
@@ -1587,9 +1608,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     $('#sheetClose').onclick = closePosSheet;
     var sh = $('#posSheet');
     sh.style.removeProperty('--dy');
-    sh.classList.add('on'); sh.setAttribute('aria-hidden', 'false');
-    $('#sheetBg').classList.add('on');
+    sh.classList.remove('on');
+    sh.setAttribute('aria-hidden', 'false');
     document.documentElement.classList.add('sheet-open');
+    requestAnimationFrame(function () { requestAnimationFrame(function () {
+      sh.classList.add('on'); $('#sheetBg').classList.add('on');
+    }); });
   }
   function closePosSheet() {
     var sh = $('#posSheet');
@@ -2128,7 +2152,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     ['dragenter', 'dragover'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); dz.classList.add('hot'); }); });
     ['dragleave', 'drop'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); dz.classList.remove('hot'); }); });
     document.addEventListener('drop', function (e) { if (e.dataTransfer.files[0]) readFile(e.dataTransfer.files[0]); });
-    $$('.tab').forEach(function (t) { t.onclick = function () { state.tab = t.dataset.tab; render(); }; });
+    $$('.tab').forEach(function (t) { t.onclick = function () { goTab(t.dataset.tab); }; });
     $('#q').oninput = function () { state.q = this.value; if (state.tab === 'karta') renderKarta(); };
     $('#onlyLag').onchange = function () { state.onlyLag = this.checked; renderKarta(); };
     (function () {
@@ -2167,7 +2191,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         lens.classList.remove('drag');
         if (hot) hot.classList.remove('hot');
         var b = hot; hot = null;
-        if (b && b.dataset.tab !== state.tab) { state.tab = b.dataset.tab; render(); } else placeLens();
+        if (b && b.dataset.tab !== state.tab) goTab(b.dataset.tab); else placeLens();
       }
       nav.addEventListener('pointerup', end);
       nav.addEventListener('pointercancel', end);
@@ -2197,7 +2221,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         $$('td.c.sel', $('#mapBox')).forEach(function (x) { x.classList.remove('sel'); });
         var trPos = posTh.closest('tr');
         $$('table.hmap tbody tr', $('#mapBox')).forEach(function (tr) { tr.classList.toggle('row-dim', tr !== trPos); });
-        showRowInfo(rPos);
+        $('#cellInfo').innerHTML = '';
         openPosSheet(rPos, -1);
         return;
       }
@@ -2243,7 +2267,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       // гистерезис, чтобы шапка не дёргалась на границе
       window.addEventListener('scroll', function () {
         var y = window.scrollY, c = hdr.classList.contains('compact');
-        if (!c && y > 48) hdr.classList.add('compact');
+        // на короткой странице не сжимаем: смена высоты шапки дёргала прокрутку и панели Safari
+        var room = document.documentElement.scrollHeight - window.innerHeight;
+        if (!c && y > 48 && room > 160) hdr.classList.add('compact');
         else if (c && y < 16) hdr.classList.remove('compact');
       }, { passive: true });
       var setH = function () { document.documentElement.style.setProperty('--hdr-h', hdr.offsetHeight + 'px'); };
