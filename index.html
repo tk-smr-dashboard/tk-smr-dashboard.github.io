@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="manifest" href="manifest.json">
+<script>/* manifest только для Android и ПК: на iPhone/iPad он включает режим iOS 26, в котором полоса статуса светлая */
+(function(){var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
+if(!ios){var l=document.createElement('link');l.rel='manifest';l.href='manifest.json';document.head.appendChild(l);}})();</script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
 <title>ТК СМР β</title>
 <meta name="apple-mobile-web-app-title" content="ТК СМР">
@@ -35,10 +37,12 @@
   --navy-glass:rgba(20,55,150,.68); --navy-glass-strong:rgba(37,110,240,.86);
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{background:#173a63}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{transition:background-color .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease,fill .25s ease,stroke .25s ease}
 /* ---- фон: мягкие цветные пятна под стеклом ---- */
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
+/* фон не должен касаться верхнего края: установленное приложение iOS 26 красит полосу статуса в цвет такого слоя */
+body::before{content:"";position:fixed;left:0;right:0;bottom:0;top:var(--hdr-h,120px);z-index:-1;pointer-events:none;
   background:
     radial-gradient(640px 420px at 8% 30%, rgba(46,117,182,.10), transparent 60%),
     radial-gradient(560px 460px at 102% 60%, rgba(237,125,49,.07), transparent 60%),
@@ -70,8 +74,7 @@ small{font-weight:400;color:var(--dim);font-size:12px}
 header{position:sticky;top:0;z-index:36;
   transition:padding .3s ease,background-color .25s ease,box-shadow .25s ease;
   /* цвет — как у заставки (#173a63) */
-  background:rgba(23,58,99,.97);
-  -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+  background:#173a63;
   color:#fff;
   padding:18px 22px;padding-top:calc(18px + env(safe-area-inset-top));
   display:flex;align-items:center;justify-content:space-between;gap:14px;
@@ -93,7 +96,7 @@ header.compact .icobtn{width:32px;height:32px}
 .icobtn{flex:0 0 auto;width:36px;height:36px;border-radius:11px;border:1px solid rgba(255,255,255,.4);
   background:rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center;
   cursor:pointer;transition:.15s;box-shadow:0 1px 0 rgba(255,255,255,.3) inset}
-.icobtn:hover{background:#fff;color:var(--navy2)}
+@media(hover:hover){.icobtn:hover{background:#fff;color:var(--navy2)}}
 .icobtn:active,.btn:active{transform:scale(.94)}
 .icobtn svg{width:18px;height:18px}
 .btn{background:rgba(255,255,255,.92);color:var(--navy2);border:0;border-radius:12px;padding:9px 16px;font-weight:600;
@@ -493,8 +496,8 @@ th.sorted .sar{opacity:1;color:var(--org)}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.35)}
 .st-av svg{width:26px;height:26px}
 .st-av b{font-size:16px;font-weight:800;letter-spacing:-.3px}
-.st span{font-size:11.5px;font-weight:600;color:var(--ink2);max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.st.seen span{color:var(--dim)}
+.st>span:last-child{font-size:11.5px;font-weight:600;color:var(--ink2);max-width:74px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.st.seen>span:last-child{color:var(--dim)}
 :root[data-theme="dark"] .st.seen .st-ring{background:#3a4454}
 /* полноэкранный просмотр */
 .sv{position:fixed;inset:0;z-index:90;display:flex;flex-direction:column;color:#fff;
@@ -536,9 +539,28 @@ th.sorted .sar{opacity:1;color:var(--org)}
 .sv-it .v{flex:0 0 auto;font-size:16px;font-weight:800;font-variant-numeric:tabular-nums}
 .sv-hint{text-align:center;font-size:11px;opacity:.5}
 html.sv-open,html.sv-open body{overflow:hidden}
+/* ---------- стартовый экран (книга ещё не загружена) ---------- */
+html.nodata .bar2,html.nodata .bottomnav,html.nodata #tmach{display:none!important}
+html.nodata header{box-shadow:none}
+html.nodata #drop{min-height:calc(100vh - var(--hdr-h,90px));min-height:calc(100dvh - var(--hdr-h,90px));margin:0;border:0;border-radius:0;
+  background:transparent;padding:32px 26px calc(40px + env(safe-area-inset-bottom));gap:16px}
+html.nodata #drop.hot{background:rgba(237,125,49,.06);outline:2px dashed var(--org);outline-offset:-14px}
+.drop-logo{width:104px;height:104px;border-radius:26px;background:#173a63;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;box-shadow:0 18px 40px -16px rgba(18,51,92,.55),inset 0 1px 0 rgba(255,255,255,.12);margin-bottom:6px}
+.drop-logo b{color:#fff;font-size:34px;font-weight:800;line-height:1;letter-spacing:.5px}
+.drop-logo i{font-style:normal;color:#ed7d31;font-size:12px;font-weight:800;letter-spacing:3px;margin-top:5px}
+.drop-logo span{display:flex;gap:4px;margin-top:8px}
+.drop-logo u{width:9px;height:9px;border-radius:2.5px;background:#bfe3c8}
+.drop-logo u:nth-child(2){background:#fbe3b3} .drop-logo u:nth-child(3){background:#f3b8b0} .drop-logo u:nth-child(4){background:#8fd0a3}
+#drop .big{font-size:24px;font-weight:800;letter-spacing:-.3px;color:var(--ink)}
+#drop p{font-size:14.5px;line-height:1.55;max-width:420px}
+.drop-btn{background:#173a63!important;color:#fff!important;font-size:16px!important;padding:15px 34px!important;border-radius:16px!important;
+  margin-top:10px;box-shadow:0 12px 26px -12px rgba(18,51,92,.6)!important;cursor:pointer}
+.drop-hint{font-size:12.5px;color:var(--dim)}
+@media(pointer:coarse){.drop-hint{display:none}}
 /* ---------- карточка позиции: панель снизу, как в «Погоде» на iPhone ---------- */
-.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;transition:opacity .5s ease}
-.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;visibility:hidden;transition:opacity .5s ease,visibility 0s linear .5s}
+.sheet-bg.on{opacity:1;pointer-events:auto;visibility:visible;transition:opacity .5s ease,visibility 0s}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:640px;margin:0 auto;max-height:88vh;max-height:88dvh;
   display:flex;flex-direction:column;border-radius:28px 28px 0 0;
   background:rgba(246,248,251,.9);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
@@ -702,6 +724,7 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 </style>
 </head>
 <body>
+<script>document.documentElement.classList.add('nodata');</script>
 <script>(function(){try{var t=localStorage.getItem('tk_theme');if(!t)t=matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light';document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 
 <div id="appSplash">
@@ -731,14 +754,11 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 
 <header>
   <div class="topbar-txt">
-    <h1 id="pageTitle">Обзор</h1>
-    <div class="hdr-mini" id="pageTitleMini" aria-hidden="true">Обзор</div>
+    <h1 id="pageTitle">ТК СМР</h1>
+    <div class="hdr-mini" id="pageTitleMini" aria-hidden="true">ТК СМР</div>
   </div>
   <div style="display:flex;gap:8px;align-items:center;flex:0 0 auto">
     <button class="icobtn" id="btnTheme" title="Тема оформления" aria-label="Переключить тему"></button>
-    <button class="icobtn" id="btnPrint" title="Печать / PDF" aria-label="Печать / PDF">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
-    </button>
   </div>
 </header>
 
@@ -765,9 +785,11 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
 <div id="tmach" class="tmach" style="display:none"></div>
 
 <div id="drop">
-  <div class="big">Перетащите сюда файл «Тепловая карта 2.x.xlsm»</div>
-  <p>Дашборд читает книгу прямо в браузере — данные никуда не передаются. После обновления ТК перетащите новый файл: показатели, карта, кривая и аномалии будут пересчитаны автоматически.</p>
-  <label class="btn" style="background:var(--navy2);color:#fff">Выбрать файл<input id="file" type="file" accept=".xlsm,.xlsx" hidden></label>
+  <div class="drop-logo"><b>ТК</b><i>СМР</i><span><u></u><u></u><u></u><u></u></span></div>
+  <div class="big">Дашборд выполнения СМР</div>
+  <p>Загрузите книгу «Тепловая карта 2.x» — обзор, карта, кривая выполнения и риски рассчитаются автоматически. Файл обрабатывается прямо на устройстве и никуда не передаётся.</p>
+  <label class="btn drop-btn">Выбрать файл<input id="file" type="file" accept=".xlsm,.xlsx" hidden></label>
+  <div class="drop-hint">или перетащите файл в это окно</div>
 </div>
 
 <div id="busy"><div class="spin"></div><div id="busyTxt">Чтение файла…</div></div>
@@ -1343,6 +1365,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   function boot() {
     setBusy(false);
     $('#drop').style.display = 'none';
+    document.documentElement.classList.remove('nodata');
     $('#main').style.display = '';
     $('#fname').textContent = FILE;
     $('#rdate').textContent = C.fmtD(M.reportDate);
@@ -2594,7 +2617,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       sh.addEventListener('pointerup', up);
       sh.addEventListener('pointercancel', up);
     })();
-    $('#btnPrint').onclick = function () { window.print(); };
     (function () {
       var hdr = $('header');
       // гистерезис, чтобы шапка не дёргалась на границе
