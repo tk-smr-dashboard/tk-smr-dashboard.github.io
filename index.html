@@ -40,8 +40,8 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 /* ---- фон: мягкие цветные пятна под стеклом ---- */
 body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;
   background:
-    radial-gradient(640px 420px at 8% -6%, rgba(46,117,182,.16), transparent 60%),
-    radial-gradient(560px 460px at 102% 8%, rgba(237,125,49,.13), transparent 60%),
+    radial-gradient(640px 420px at 8% 30%, rgba(46,117,182,.10), transparent 60%),
+    radial-gradient(560px 460px at 102% 60%, rgba(237,125,49,.07), transparent 60%),
     radial-gradient(680px 520px at 30% 112%, rgba(30,132,73,.10), transparent 60%),
     var(--bg)}
 /* ---------- заставка при запуске ---------- */
@@ -117,11 +117,9 @@ header.compact .icobtn{width:32px;height:32px}
 .infobar svg{flex:0 0 auto;width:18px;height:18px;margin-top:1px;color:var(--blue)}
 
 /* ---------- панель фильтров: стеклянная полка ---------- */
-.bar2{background:
-    linear-gradient(180deg,rgba(255,255,255,.5),rgba(255,255,255,0) 60%),
-    var(--glass-bg);
+.bar2{background:rgba(238,242,247,.86);
   -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
-  border-bottom:1px solid rgba(255,255,255,.5);box-shadow:0 10px 26px -20px rgba(20,40,70,.35);
+  border-bottom:1px solid rgba(20,40,70,.07);box-shadow:0 10px 26px -22px rgba(20,40,70,.3);
   padding:10px 24px;display:flex;
   gap:10px;align-items:center;flex-wrap:wrap;position:sticky;top:var(--hdr-h,0px);z-index:30}
 .tabs{display:flex;gap:4px}
@@ -152,6 +150,16 @@ label.chk{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;
 .minib:hover{border-color:var(--blue);color:var(--blue)}
 .minib.on{background:var(--blue-l);border-color:var(--blue);color:var(--ink2)}
 .tab:active,.pkbtn:active,.minib:active{transform:scale(.95)}
+/* ---------- панель инструментов тепловой карты: переключатель не прыгает при смене режима ---------- */
+.maptools{display:flex;gap:10px 12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.maptools #q{flex:1 1 220px;max-width:340px}
+.maptools .chk{white-space:nowrap}
+#mapModeSeg{flex:0 0 168px;margin-left:auto}
+.maphint{font-size:12px;margin:0 2px 10px;min-height:16px}
+@media(max-width:640px){
+  .maptools #q{flex:1 1 100%;max-width:none}
+  .maptools .chk{font-size:12.5px}
+}
 /* ---------- сегмент-переключатель (%/Физика) со скользящим индикатором ---------- */
 .seg{position:relative;display:flex;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.6);
   border-radius:12px;padding:3px;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
@@ -279,7 +287,7 @@ table.hmap tbody th.stick:hover{background:var(--blue-l)}
 table.hmap th.stick b{display:block;font-size:12px;color:var(--ink2)}
 table.hmap th.stick span{display:block;font-size:10.5px;color:var(--dim);white-space:nowrap;overflow:hidden;
   text-overflow:ellipsis;max-width:182px;font-weight:400}
-.vert{writing-mode:vertical-rl;transform:rotate(180deg);height:66px;margin:0 auto;white-space:nowrap;
+.vert{writing-mode:vertical-rl;transform:rotate(180deg);height:78px;margin:0 auto;white-space:nowrap;
   font-weight:600;overflow:hidden;text-overflow:ellipsis}
 td.c{width:44px;min-width:44px;height:44px;text-align:center;font-weight:700;font-size:11.5px;color:#20323f;
   font-variant-numeric:tabular-nums;
@@ -405,7 +413,7 @@ th.sorted .sar{opacity:1;color:var(--org)}
 
 /* ---------- нижний таб-бар: плавающая стеклянная капсула ---------- */
 .bottomnav{display:none;position:fixed;left:calc(10px + env(safe-area-inset-left));right:calc(10px + env(safe-area-inset-right));
-  bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;max-width:520px;margin:0 auto;
+  bottom:max(10px, calc(env(safe-area-inset-bottom) - 14px));z-index:40;max-width:520px;margin:0 auto;
   touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;
   /* прозрачнее, но с более сильным размытием — подписи остаются читаемыми */
   background:
@@ -455,7 +463,7 @@ th.sorted .sar{opacity:1;color:var(--org)}
   .fgrp-pk{margin-left:0;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
     margin-right:-12px;padding-right:12px}
   .fgrp-pk::-webkit-scrollbar{display:none}
-  main{padding:12px 12px 94px}
+  main{padding:12px 12px calc(84px + env(safe-area-inset-bottom))}
   .bottomnav{display:flex}
   .card{padding:12px 13px;margin-bottom:12px}
   .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -468,6 +476,49 @@ th.sorted .sar{opacity:1;color:var(--org)}
   .viewsel .pkbtn{flex:0 0 auto}
   #drop{min-height:60vh;margin:14px;padding:24px}
 }
+/* ---------- карточка позиции: панель снизу, как в «Погоде» на iPhone ---------- */
+.sheet-bg{position:fixed;inset:0;z-index:60;background:rgba(10,22,40,.34);opacity:0;pointer-events:none;transition:opacity .32s ease}
+.sheet-bg.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:61;max-width:640px;margin:0 auto;max-height:88vh;max-height:88dvh;
+  display:flex;flex-direction:column;border-radius:28px 28px 0 0;
+  background:rgba(246,248,251,.9);-webkit-backdrop-filter:blur(30px) saturate(180%);backdrop-filter:blur(30px) saturate(180%);
+  box-shadow:0 1px 0 rgba(255,255,255,.9) inset,0 -14px 44px -12px rgba(10,25,45,.38);
+  transform:translateY(105%);transition:transform .4s cubic-bezier(.4,0,.6,1),visibility 0s linear .4s;visibility:hidden}
+.sheet.on{transform:translateY(var(--dy,0px));visibility:visible;transition:transform .45s cubic-bezier(.22,1,.36,1),visibility 0s}
+.sheet.drag{transition:none}
+.sheet-grab{flex:0 0 auto;display:flex;justify-content:center;padding:10px 0 4px;cursor:grab;touch-action:none}
+.sheet-grab i{width:40px;height:5px;border-radius:3px;background:rgba(20,40,70,.22)}
+.sheet-body{overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;
+  padding:2px 18px calc(22px + env(safe-area-inset-bottom))}
+html.sheet-open,html.sheet-open body{overflow:hidden}
+.sh-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px;touch-action:none}
+.sh-head .t{flex:1;min-width:0}
+.sh-pk{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.4px;color:var(--dim);text-transform:uppercase;margin-bottom:2px}
+.sh-pos{font-size:26px;font-weight:800;letter-spacing:-.4px;color:var(--ink);line-height:1.15}
+.sh-name{font-size:13px;color:var(--dim);margin-top:3px;line-height:1.35}
+.sh-x{flex:0 0 auto;width:32px;height:32px;border-radius:50%;border:0;background:rgba(20,40,70,.08);color:var(--ink2);
+  font-size:18px;line-height:32px;cursor:pointer}
+.sh-tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.sh-tile{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:10px 10px 9px;
+  box-shadow:0 4px 14px -10px rgba(20,40,70,.35)}
+.sh-tile span{display:block;font-size:10px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:var(--dim)}
+.sh-tile b{display:block;font-size:20px;font-weight:800;color:var(--ink);margin-top:3px;font-variant-numeric:tabular-nums}
+.sh-tile b.good{color:var(--green)} .sh-tile b.badt{color:var(--red)}
+.sh-cap{font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--dim);margin:2px 4px 8px}
+.sh-list{display:flex;flex-direction:column;gap:8px}
+.sh-item{background:rgba(255,255,255,.72);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:11px 12px}
+.sh-item.sel{box-shadow:0 0 0 2px var(--org)}
+.sh-it-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.sh-it-top b{font-size:13.5px;color:var(--ink2)}
+.sh-it-top b small{font-size:11px}
+.sh-item .bar{margin-bottom:7px}
+.sh-nums{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:var(--dim)}
+.sh-nums b{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+@media(max-width:420px){.sh-tiles{grid-template-columns:repeat(2,1fr)}}
+:root[data-theme="dark"] .sheet{background:rgba(22,28,36,.9);box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 -14px 44px -12px rgba(0,0,0,.6)}
+:root[data-theme="dark"] .sheet-grab i{background:rgba(255,255,255,.28)}
+:root[data-theme="dark"] .sh-x{background:rgba(255,255,255,.1)}
+:root[data-theme="dark"] .sh-tile,:root[data-theme="dark"] .sh-item{background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.08)}
 /* ---------- планшеты (Android, iPad): сенсорный экран шире телефона — нижняя капсула вместо верхних вкладок ---------- */
 @media (pointer:coarse) and (min-width:641px){
   .bottomnav{display:flex}
@@ -481,7 +532,7 @@ th.sorted .sar{opacity:1;color:var(--org)}
   header h1{font-size:19px}
   .icobtn{width:30px;height:30px}
   .bar2{padding:6px 12px}
-  .bottomnav{padding:4px;bottom:calc(6px + env(safe-area-inset-bottom))}
+  .bottomnav{padding:4px;bottom:max(6px, calc(env(safe-area-inset-bottom) - 12px))}
   .nav-lens{top:4px;bottom:4px;border-radius:15px}
   /* мало высоты: фильтры уезжают при прокрутке, закреплена только шапка */
   .bar2{position:static}
@@ -681,18 +732,18 @@ th.sorted .sar{opacity:1;color:var(--org)}
   <div class="pane" id="pane-karta" style="display:none">
     <div class="card">
       <h2>Позиции генплана × виды работ <small id="mapCount"></small></h2>
-      <div style="display:flex;gap:12px;align-items:center;margin-bottom:10px;flex-wrap:wrap">
+      <div class="maptools">
         <input id="q" type="search" placeholder="Поиск по позиции или наименованию…">
-        <label class="chk"><input id="onlyLag" type="checkbox"> только позиции с отставанием</label>
-        <span class="dim" id="mapHint" style="font-size:12px;margin-left:auto">в ячейке — % готовности от объёма по РД</span>
+        <label class="chk"><input id="onlyLag" type="checkbox"> только с отставанием</label>
         <div class="seg" id="mapModeSeg" data-active="pct">
           <i class="seg-thumb"></i>
           <button class="on" data-mode="pct">%</button>
           <button data-mode="phys">Физика</button>
         </div>
       </div>
+      <div class="dim maphint" id="mapHint">в ячейке — % готовности от объёма по РД</div>
       <div class="viewsel" id="viewSel"></div>
-      <div class="cellinfo" id="cellInfo"><div class="ci-hint">Нажмите на ячейку карты, чтобы увидеть детали по позиции и виду работ</div></div>
+      <div class="cellinfo" id="cellInfo"><div class="ci-hint">Нажмите на позицию — откроется карточка по всем видам работ; на ячейку — детали по виду</div></div>
       <div id="mapBox"></div>
       <div class="legend">
         <span><i class="sw" style="background:#bfe3c8"></i>план выполнен</span>
@@ -766,6 +817,11 @@ th.sorted .sar{opacity:1;color:var(--org)}
 
 </main>
 
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="posSheet" role="dialog" aria-modal="true" aria-hidden="true">
+  <div class="sheet-grab" id="sheetGrab"><i></i></div>
+  <div class="sheet-body" id="sheetBody"></div>
+</div>
 <nav class="bottomnav" id="bottomNav">
   <i class="nav-lens" id="navLens"></i>
   <button class="tab navbtn" data-tab="obzor">
@@ -1437,7 +1493,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     }
     if (state.onlyLag) rows = rows.filter(function (r) { return r.v.some(function (c) { return c.tot > 0 && c.fakt < c.plan - 1e-9; }); });
     kartaRows = rows;
-    $('#cellInfo').innerHTML = '<div class="ci-hint">Нажмите на ячейку карты, чтобы увидеть детали по позиции и виду работ</div>';
+    $('#cellInfo').innerHTML = '<div class="ci-hint">Нажмите на позицию — откроется карточка по всем видам работ; на ячейку — детали по виду</div>';
     $('#mapHint').textContent = state.mapMode === 'phys'
       ? 'в ячейке — факт / план в физических показателях'
       : 'в ячейке — % готовности от объёма по РД';
@@ -1446,7 +1502,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     var phys = state.mapMode === 'phys';
 
     var h = ['<div class="mapwrap"><table class="hmap' + (phys ? ' phys' : '') + '"><thead><tr><th class="stick l">Позиция</th>'];
-    visIdx.forEach(function (i) { var v = M.views[i]; h.push('<th title="' + esc(v.name) + '"><div class="vert">' + esc(v.short) + '</div></th>'); });
+    visIdx.forEach(function (i) { var v = M.views[i]; h.push('<th title="' + esc(v.name) + '"><div class="vert">' + esc(abbrView(v.short)) + '</div></th>'); });
     h.push('</tr></thead><tbody>');
     rows.forEach(function (r, ri) {
       h.push('<tr style="animation-delay:' + Math.min(ri * 9, 500) + 'ms"><th class="stick l" data-ri="' + ri + '" title="Нажмите, чтобы выделить позицию"><b>' + esc(r.pos) + '</b><span>' + esc(r.name) + '</span></th>');
@@ -1468,6 +1524,19 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     $('#mapCount').textContent = rows.length + ' поз. · состояние на ' + C.fmtD(state.to);
   }
 
+  /* короткие подписи колонок тепловой карты (полное название — в подсказке и карточке позиции) */
+  var VIEW_ABBR = [
+    [/погруж/i, 'Сваи'], [/оголов/i, 'Оголовки'], [/бетон/i, 'Бетон'], [/м\/к/i, 'Металлок.'],
+    [/сварк/i, 'Сварка'], [/зра.*до\s*100/i, 'ЗРА ≤100'], [/зра.*100\s*[-–]\s*500/i, 'ЗРА 100–500'],
+    [/зра.*>\s*500|зра.*более\s*500/i, 'ЗРА >500'], [/акз/i, 'АКЗ'], [/стойк/i, 'Стойки'],
+    [/полк/i, 'Полки'], [/лотк/i, 'Лотки'], [/расключ.*сил/i, 'Раскл. сил.'], [/расключ.*контр/i, 'Раскл. контр.'],
+    [/греющ/i, 'Греющий'], [/кабел.*сил|сил.*кабел/i, 'Кабель сил.'], [/кабел.*контр|контр.*кабел/i, 'Кабель контр.'],
+    [/кип|прибор|датчик/i, 'КИП']
+  ];
+  function abbrView(s) {
+    for (var i = 0; i < VIEW_ABBR.length; i++) if (VIEW_ABBR[i][0].test(s)) return VIEW_ABBR[i][1];
+    return s.length > 12 ? s.slice(0, 11) + '…' : s;
+  }
   function showCellInfo(r, vi) {
     var c = r.v[vi], v = M.views[vi];
     var rd = c.tot ? c.fakt / c.tot : 0;
@@ -1481,6 +1550,55 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         '<div><span>Вып. плана</span><b>' + (c.plan ? pf(c.fakt / c.plan) : '—') + '</b></div>' +
         '<div><span>Δ факт за период</span><b>' + (c.dFakt ? sgn(c.dFakt) : '—') + '</b></div>' +
       '</div>';
+  }
+  /* ---- карточка позиции (выезжает снизу) ---- */
+  function openPosSheet(r, vi) {
+    var items = r.v.map(function (c, i) { return { c: c, i: i, v: M.views[i] }; }).filter(function (x) { return x.c.tot > 0; });
+    var exec = function (c) { return c.plan ? c.fakt / c.plan : (c.fakt ? 1 : 0); };
+    items.sort(function (a, b) { return (a.i === vi ? -1 : b.i === vi ? 1 : 0) || exec(a.c) - exec(b.c); });
+    var sumRd = 0, lag = 0, moved = 0;
+    items.forEach(function (x) { var c = x.c; sumRd += c.fakt / c.tot; if (c.plan && c.fakt < c.plan - 1e-9) lag++; if (c.dFakt > 0) moved++; });
+    var ready = items.length ? sumRd / items.length : 0;
+    var h = ['<div class="sh-head"><div class="t"><span class="sh-pk">' + esc(r.pk) + '</span>' +
+      '<div class="sh-pos">' + esc(r.pos) + '</div><div class="sh-name">' + esc(r.name) + '</div></div>' +
+      '<button class="sh-x" id="sheetClose" aria-label="Закрыть">✕</button></div>'];
+    h.push('<div class="sh-tiles">' +
+      '<div class="sh-tile"><span>Готовность</span><b>' + pf(ready) + '</b></div>' +
+      '<div class="sh-tile"><span>Видов работ</span><b>' + items.length + '</b></div>' +
+      '<div class="sh-tile"><span>Отстают</span><b class="' + (lag ? 'badt' : 'good') + '">' + lag + '</b></div>' +
+      '<div class="sh-tile"><span>С приростом</span><b>' + moved + '</b></div></div>');
+    if (!items.length) h.push('<div class="empty">По этой позиции нет объёмов ни по одному виду работ.</div>');
+    else {
+      h.push('<div class="sh-cap">' + (vi >= 0 ? 'Выбранный вид — сверху, далее по выполнению плана' : 'По видам работ · сначала отстающие') + '</div><div class="sh-list">');
+      items.forEach(function (x) {
+        var c = x.c, st = statusOf(c.fakt, c.plan, c.tot), rd = c.fakt / c.tot;
+        h.push('<div class="sh-item' + (x.i === vi ? ' sel' : '') + '"><div class="sh-it-top"><b>' + esc(x.v.short) + ' <small class="dim">' + esc(x.v.unit) + '</small></b>' +
+          '<span class="pill ' + st + '">' + ST_LABEL[st] + '</span></div>' +
+          '<div class="bar"><i class="' + st + '" style="width:' + Math.min(100, rd * 100) + '%"></i><u style="left:' + Math.min(100, c.plan / c.tot * 100) + '%"></u><span>' + pf(rd) + '</span></div>' +
+          '<div class="sh-nums"><span>Факт <b>' + nf(c.fakt) + '</b></span><span>План <b>' + nf(c.plan) + '</b></span><span>Всего <b>' + nf(c.tot) + '</b></span>' +
+          (c.plan ? '<span>Вып. плана <b class="' + (c.fakt >= c.plan - 1e-9 ? 'good' : 'badt') + '">' + pf(c.fakt / c.plan) + '</b></span>' : '') +
+          (c.dFakt ? '<span>За период <b class="' + (c.dFakt > 0 ? 'good' : 'badt') + '">' + sgn(c.dFakt) + '</b></span>' : '') + '</div></div>');
+      });
+      h.push('</div>');
+    }
+    var body = $('#sheetBody');
+    body.innerHTML = h.join('');
+    body.scrollTop = 0;
+    $('#sheetClose').onclick = closePosSheet;
+    var sh = $('#posSheet');
+    sh.style.removeProperty('--dy');
+    sh.classList.add('on'); sh.setAttribute('aria-hidden', 'false');
+    $('#sheetBg').classList.add('on');
+    document.documentElement.classList.add('sheet-open');
+  }
+  function closePosSheet() {
+    var sh = $('#posSheet');
+    if (!sh.classList.contains('on')) return;
+    sh.classList.remove('on', 'drag'); sh.style.removeProperty('--dy'); sh.setAttribute('aria-hidden', 'true');
+    $('#sheetBg').classList.remove('on');
+    document.documentElement.classList.remove('sheet-open');
+    $$('#mapBox tr.row-dim').forEach(function (tr) { tr.classList.remove('row-dim'); });
+    $$('#mapBox td.c.sel').forEach(function (x) { x.classList.remove('sel'); });
   }
   function showRowInfo(r) {
     var items = r.v.map(function (c, i) { return { c: c, v: M.views[i] }; }).filter(function (x) { return x.c.tot > 0; });
@@ -2080,6 +2198,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         var trPos = posTh.closest('tr');
         $$('table.hmap tbody tr', $('#mapBox')).forEach(function (tr) { tr.classList.toggle('row-dim', tr !== trPos); });
         showRowInfo(rPos);
+        openPosSheet(rPos, -1);
         return;
       }
       var td = e.target.closest('td.c');
@@ -2091,7 +2210,33 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       var trSel = td.closest('tr');
       $$('table.hmap tbody tr', $('#mapBox')).forEach(function (tr) { tr.classList.toggle('row-dim', tr !== trSel); });
       showCellInfo(r, +td.dataset.vi);
+      if (matchMedia('(pointer:coarse), (max-width:640px)').matches) openPosSheet(r, +td.dataset.vi);
     });
+    /* закрытие карточки: фон, Esc, смахивание вниз за ручку или шапку */
+    $('#sheetBg').onclick = closePosSheet;
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePosSheet(); });
+    (function () {
+      var sh = $('#posSheet'), y0 = null, t0 = 0, dy = 0, pid = null;
+      sh.addEventListener('pointerdown', function (e) {
+        if (!e.target.closest('.sheet-grab, .sh-head') || e.target.closest('.sh-x')) return;
+        pid = e.pointerId; y0 = e.clientY; t0 = Date.now(); dy = 0;
+        try { sh.setPointerCapture(pid); } catch (x) { }
+        sh.classList.add('drag');
+      });
+      sh.addEventListener('pointermove', function (e) {
+        if (e.pointerId !== pid) return;
+        dy = Math.max(0, e.clientY - y0);
+        sh.style.setProperty('--dy', dy + 'px');
+      });
+      function up(e) {
+        if (e.pointerId !== pid) return;
+        pid = null; sh.classList.remove('drag');
+        var fast = dy > 40 && dy / Math.max(1, Date.now() - t0) > 0.5;
+        if (dy > 110 || fast) closePosSheet(); else sh.style.removeProperty('--dy');
+      }
+      sh.addEventListener('pointerup', up);
+      sh.addEventListener('pointercancel', up);
+    })();
     $('#btnPrint').onclick = function () { window.print(); };
     (function () {
       var hdr = $('header');
