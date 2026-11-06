@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>/* установленное приложение iOS: режим и тёмная схема верхней системной зоны, как было до появления светлой полосы */
+(function(){if(!navigator.standalone)return;var d=document.documentElement;
+document.querySelector('meta[name=viewport]').content='width=device-width, initial-scale=1';
+d.classList.add('ios-app');d.style.colorScheme='dark';
+var m=document.createElement('meta');m.name='color-scheme';m.content='dark';document.head.appendChild(m);
+addEventListener('DOMContentLoaded',function(){if(innerHeight>=screen.height-2)d.style.setProperty('--sat','50px');});})();</script>
 <script>/* manifest только для Android и ПК: на iPhone/iPad он включает режим iOS 26, в котором полоса статуса светлая */
 (function(){var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
 if(!ios){var l=document.createElement('link');l.rel='manifest';l.href='manifest.json';document.head.appendChild(l);}})();</script>
@@ -38,6 +44,8 @@ if(!ios){var l=document.createElement('link');l.rel='manifest';l.href='manifest.
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:#173a63}
+body{color-scheme:light}
+html.ios-app header{border-top:var(--sat,0px) solid #173a63}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 *{transition:background-color .25s ease,color .25s ease,border-color .25s ease,box-shadow .25s ease,fill .25s ease,stroke .25s ease}
 /* ---- фон: мягкие цветные пятна под стеклом ---- */
@@ -159,7 +167,7 @@ label.chk{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;
 .maptools{display:flex;gap:10px 12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
 .maptools #q{flex:1 1 220px;max-width:340px}
 .maptools .chk{white-space:nowrap}
-#mapModeSeg{flex:0 0 168px;margin-left:auto}
+#mapModeSeg{flex:0 0 240px;margin-left:auto}
 .maphint{font-size:12px;margin:0 2px 10px;min-height:16px}
 @media(max-width:640px){
   .maptools #q{flex:1 1 100%;max-width:none}
@@ -182,6 +190,9 @@ label.chk{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;
 .seg3 .seg-thumb{width:calc((100% - 6px) / 3)}
 .seg3[data-active="1"] .seg-thumb{transform:translateX(100%)}
 .seg3[data-active="2"] .seg-thumb{transform:translateX(200%)}
+#mapModeSeg[data-active="phys"] .seg-thumb{transform:translateX(100%)}
+#mapModeSeg[data-active="dyn"] .seg-thumb{transform:translateX(200%)}
+@media(max-width:640px){#mapModeSeg{flex:1 1 100%;margin-left:0}}
 .seg3 button{padding:8px 6px}
 .dyn-seg{margin:0 0 14px}
 #pane-dinamika>.card[data-sec]{display:none}
@@ -826,17 +837,26 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
       <div class="maptools">
         <input id="q" type="search" placeholder="Поиск по позиции или наименованию…">
         <label class="chk"><input id="onlyLag" type="checkbox"> только с отставанием</label>
-        <div class="seg" id="mapModeSeg" data-active="pct">
+        <div class="seg seg3" id="mapModeSeg" data-active="pct">
           <i class="seg-thumb"></i>
           <button class="on" data-mode="pct">%</button>
           <button data-mode="phys">Физика</button>
+          <button data-mode="dyn">Прирост</button>
         </div>
       </div>
       <div class="dim maphint" id="mapHint">в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку</div>
       <div class="viewsel" id="viewSel"></div>
       <div class="cellinfo" id="cellInfo"></div>
       <div id="mapBox"></div>
-      <div class="legend">
+      <div class="legend" id="legendDyn" hidden>
+        <span><b style="font-size:13px">+12</b>&nbsp;прирост факта</span>
+        <span style="opacity:.7">+10&nbsp;прирост плана</span>
+        <span><i class="sw" style="background:#bfe3c8"></i>в графике</span>
+        <span><i class="sw" style="background:#fbe3b3"></i>отстаёт: 80–99% прироста плана</span>
+        <span><i class="sw" style="background:#f3b8b0"></i>отстаёт: менее 80%</span>
+        <span><i class="sw" style="background:#e9edf1"></i>факт не менялся, отставания нет</span>
+      </div>
+      <div class="legend" id="legendMain">
         <span><i class="sw" style="background:#bfe3c8"></i>план выполнен</span>
         <span><i class="sw" style="background:#fbe3b3"></i>80–99% плана</span>
         <span><i class="sw" style="background:#f3b8b0"></i>менее 80% плана</span>
@@ -1249,6 +1269,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     if (av >= 10000) return Math.round(v / 1000) + 'к';
     if (av >= 1000) return (v / 1000).toFixed(1).replace(/\.0$/, '') + 'к';
     return String(Math.round(v));
+  }
+  function dShort(v) {
+    if (Math.abs(v) < 1e-9) return '—';
+    var a = Math.abs(v), t = a >= 1000 ? nfShort(a) : a < 10 && a % 1 > 1e-9 ? a.toFixed(1).replace(/\.0$/, '') : String(Math.round(a));
+    return (v > 0 ? '+' : '−') + t;
   }
   function sgn(v) { return (v > 0 ? '+' : v < 0 ? '−' : '') + nf(Math.abs(v)); }
   function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]; }); }
@@ -1870,14 +1895,18 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     if (state.onlyLag) rows = rows.filter(function (r) { return r.v.some(function (c) { return c.tot > 0 && c.fakt < c.plan - 1e-9; }); });
     kartaRows = rows;
     $('#cellInfo').innerHTML = '';
-    $('#mapHint').textContent = state.mapMode === 'phys'
+    var dyn = state.mapMode === 'dyn';
+    $('#legendDyn').hidden = !dyn; $('#legendMain').hidden = dyn;
+    $('#mapHint').textContent = dyn
+      ? 'прирост за ' + C.fmtD(state.from) + ' → ' + C.fmtD(state.to) + ': сверху факт, снизу план · период меняется вверху'
+      : state.mapMode === 'phys'
       ? 'в ячейке — факт / план в физ. показателях · нажмите на позицию, чтобы открыть карточку'
       : 'в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку';
 
     var visIdx = state.viewGroup ? state.viewGroup.idx : M.views.map(function (v, i) { return i; });
     var phys = state.mapMode === 'phys';
 
-    var h = ['<div class="mapwrap"><table class="hmap' + (phys ? ' phys' : '') + '"><thead><tr><th class="stick l">Позиция</th>'];
+    var h = ['<div class="mapwrap"><table class="hmap' + (phys || dyn ? ' phys' : '') + '"><thead><tr><th class="stick l">Позиция</th>'];
     visIdx.forEach(function (i) { var v = M.views[i]; h.push('<th title="' + esc(v.name) + '"><div class="vert">' + esc(abbrView(v.short)) + '</div></th>'); });
     h.push('</tr></thead><tbody>');
     rows.forEach(function (r, ri) {
@@ -1887,7 +1916,16 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         var st = statusOf(c.fakt, c.plan, c.tot), rd = c.tot ? c.fakt / c.tot : 0;
         var tip = M.views[i].short + ' на ' + C.fmtD(state.to) + '\nВсего ' + nf(c.tot) + ' ' + M.views[i].unit +
           '\nПлан ' + nf(c.plan) + '  Факт ' + nf(c.fakt) + '\nГотовность ' + pf(rd) +
-          '  Вып. плана ' + (c.plan ? pf(c.fakt / c.plan) : '—') + (c.dFakt ? '\nΔ Факт за период ' + sgn(c.dFakt) : '');
+          '  Вып. плана ' + (c.plan ? pf(c.fakt / c.plan) : '—') + (c.dFakt ? '\nΔ Факт за период ' + sgn(c.dFakt) : '') + (c.dPlan ? '\nΔ План за период ' + sgn(c.dPlan) : '');
+        if (dyn && st !== 'na') {
+          var still = Math.abs(c.dFakt) < 1e-9 && Math.abs(c.dPlan) < 1e-9;
+          var inPlan = c.fakt >= c.plan - 1e-9, up = c.dFakt > 1e-9, k = c.dPlan > 1e-9 ? Math.max(c.dFakt, 0) / c.dPlan : 1;
+          /* накопительно план выполнен — это не отставание, даже если план за период подрос */
+          var ds = still ? 'zero' : inPlan ? (up ? 'ok' : 'zero') : !up ? 'bad' : k >= 0.999 ? 'ok' : k >= 0.8 ? 'warn' : 'bad';
+          h.push('<td class="c ' + ds + '" data-ri="' + ri + '" data-vi="' + i + '" title="' + esc(tip) + '">' +
+            (still ? '' : '<div class="cv"><b>' + dShort(c.dFakt) + '</b><i>' + dShort(c.dPlan) + '</i></div>') + '</td>');
+          return;
+        }
         var cv = st === 'na' ? '' : (phys
           ? '<div class="cv"><b>' + nfShort(c.fakt) + '</b><i>' + nfShort(c.plan) + '</i></div>'
           : String(Math.round(rd * 100)));
@@ -1954,7 +1992,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
           (c.plan ? '<u style="left:' + Math.min(100, c.plan / c.tot * 100) + '%"></u>' : '') + '</div><span class="sh-pct">' + (rd < 0.0005 ? '0%' : pf(rd)) + '</span></div>' +
           '<div class="sh-nums"><span>Факт <b>' + nf(c.fakt) + '</b></span><span>План <b>' + nf(c.plan) + '</b></span><span>Всего <b>' + nf(c.tot) + '</b></span>' +
           (c.plan ? '<span>Вып. плана <b class="' + (c.fakt >= c.plan - 1e-9 ? 'good' : 'badt') + '">' + pf(c.fakt / c.plan) + '</b></span>' : '') +
-          (c.dFakt ? '<span>За период <b class="' + (c.dFakt > 0 ? 'good' : 'badt') + '">' + sgn(c.dFakt) + '</b></span>' : '') + '</div></div>');
+          (c.dFakt ? '<span>Факт за период <b class="' + (c.dFakt > 0 ? 'good' : 'badt') + '">' + sgn(c.dFakt) + '</b></span>' : '') +
+          (c.dPlan ? '<span>План за период <b>' + sgn(c.dPlan) + '</b></span>' : '') + '</div></div>');
       });
       h.push('</div>');
     }
