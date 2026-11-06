@@ -837,6 +837,7 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
       <div class="maptools">
         <input id="q" type="search" placeholder="Поиск по позиции или наименованию…">
         <label class="chk"><input id="onlyLag" type="checkbox"> только с отставанием</label>
+        <label class="chk" title="Позиции, где за выбранный период изменился факт или план"><input id="onlyMoved" type="checkbox"> только с движением за период</label>
         <div class="seg seg3" id="mapModeSeg" data-active="pct">
           <i class="seg-thumb"></i>
           <button class="on" data-mode="pct">%</button>
@@ -1251,7 +1252,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   var state = {
     pk: C.PK_ALL, tab: 'obzor', dynSec: 0, view: 0, planSrc: 'ТК',
     from: null, to: null, full: true,
-    onlyLag: false, q: '', dynView: 0, sort: { col: null, dir: 1 },
+    onlyLag: false, onlyMoved: false, q: '', dynView: 0, sort: { col: null, dir: 1 },
     viewGroup: null, mapMode: 'pct'
   };
 
@@ -1893,6 +1894,10 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       rows = rows.filter(function (r) { return (r.pos + ' ' + r.name).toLowerCase().indexOf(q) >= 0; });
     }
     if (state.onlyLag) rows = rows.filter(function (r) { return r.v.some(function (c) { return c.tot > 0 && c.fakt < c.plan - 1e-9; }); });
+    var visIdx = state.viewGroup ? state.viewGroup.idx : M.views.map(function (v, i) { return i; });
+    if (state.onlyMoved) rows = rows.filter(function (r) {
+      return visIdx.some(function (i) { var c = r.v[i]; return Math.abs(c.dFakt) > 1e-9 || Math.abs(c.dPlan) > 1e-9; });
+    });
     kartaRows = rows;
     $('#cellInfo').innerHTML = '';
     var dyn = state.mapMode === 'dyn';
@@ -1903,7 +1908,6 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       ? 'в ячейке — факт / план в физ. показателях · нажмите на позицию, чтобы открыть карточку'
       : 'в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку';
 
-    var visIdx = state.viewGroup ? state.viewGroup.idx : M.views.map(function (v, i) { return i; });
     var phys = state.mapMode === 'phys';
 
     var h = ['<div class="mapwrap"><table class="hmap' + (phys || dyn ? ' phys' : '') + '"><thead><tr><th class="stick l">Позиция</th>'];
@@ -1934,7 +1938,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       h.push('</tr>');
     });
     h.push('</tbody></table></div>');
-    $('#mapBox').innerHTML = h.join('');
+    $('#mapBox').innerHTML = rows.length ? h.join('') : '<div class="empty">Под выбранные условия позиций нет. Измените период или снимите отметку.</div>';
     $('#mapCount').textContent = rows.length + ' поз. · состояние на ' + C.fmtD(state.to);
   }
 
@@ -2550,6 +2554,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     $$('.tab').forEach(function (t) { t.onclick = function () { goTab(t.dataset.tab); }; });
     $('#q').oninput = function () { state.q = this.value; if (state.tab === 'karta') renderKarta(); };
     $('#onlyLag').onchange = function () { state.onlyLag = this.checked; renderKarta(); };
+    $('#onlyMoved').onchange = function () { state.onlyMoved = this.checked; renderKarta(); };
     (function () {
       var nav = $('#bottomNav'), lens = $('#navLens'), btns = $$('#bottomNav .navbtn');
       var hot = null, sx = 0, moved = false, pid = null;
