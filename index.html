@@ -13,7 +13,7 @@ addEventListener('DOMContentLoaded',function(){if(innerHeight>=screen.height-2)d
 (function(){var ua=navigator.userAgent,ios=/iPhone|iPad|iPod/.test(ua)||(/Macintosh/.test(ua)&&navigator.maxTouchPoints>1);
 if(!ios){var l=document.createElement('link');l.rel='manifest';l.href='manifest.json';document.head.appendChild(l);}})();</script>
 <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
-<title>ТК СМР β</title>
+<title>ТК СМР</title>
 <meta name="apple-mobile-web-app-title" content="ТК СМР">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -164,14 +164,30 @@ label.chk{display:flex;gap:6px;align-items:center;font-size:13px;cursor:pointer;
 .minib.on{background:var(--blue-l);border-color:var(--blue);color:var(--ink2)}
 .tab:active,.pkbtn:active,.minib:active{transform:scale(.95)}
 /* ---------- панель инструментов тепловой карты: переключатель не прыгает при смене режима ---------- */
-.maptools{display:flex;gap:10px 12px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.maptools{display:flex;gap:10px 12px;align-items:center;flex-wrap:wrap}
 .maptools #q{flex:1 1 220px;max-width:340px}
-.maptools .chk{white-space:nowrap}
+.maptools .chk{display:inline-flex;align-items:center;gap:5px;min-height:34px}
 #mapModeSeg{flex:0 0 240px;margin-left:auto}
-.maphint{font-size:12px;margin:0 2px 10px;min-height:16px}
+.map-panel{display:grid;gap:9px;margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--blue-l)}
+.map-panel .viewsel{margin:0}
+#mapBox{margin-top:10px}
+.maphint{font-size:12px;margin:0 2px;min-height:16px}
+.map-topline{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:4px 14px}
+#mapCount{margin:0;font-variant-numeric:tabular-nums}
+#clearMap:disabled{opacity:.45;cursor:default}
+.maprow-gap th,.maprow-gap td{border-top:2px solid var(--blue)}
+.mapwrap table.hmap th.stick .map-pk{display:inline;font-size:10px;white-space:nowrap;margin-left:6px;color:var(--dim)}
+.mapwrap:focus-visible,.btn:focus-within,#clearMap:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.legend[hidden],.load-status[hidden]{display:none}
+.load-status{margin:0 auto 12px;max-width:800px;padding:11px 15px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--red);font-weight:600}
+#main .load-status{max-width:none}
+.file-input{position:absolute;width:1px;height:1px;opacity:0}
+.source-state{flex:1 1 100%;margin:0;color:var(--dim);font-size:12px}
 @media(max-width:640px){
   .maptools #q{flex:1 1 100%;max-width:none}
   .maptools .chk{font-size:12.5px}
+  .map-panel{padding:9px}
+  .map-panel .viewsel{padding:0}
 }
 /* ---------- сегмент-переключатель (%/Физика) со скользящим индикатором ---------- */
 .seg{position:relative;display:flex;background:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.6);
@@ -292,17 +308,18 @@ table.grid tr.inp:hover td:first-child{background:#f2f8ff}
 
 /* ---------- тепловая карта ---------- */
 .mapwrap{overflow:auto;max-height:74vh;border:1px solid var(--line);border-radius:12px}
-table.hmap{border-collapse:separate;border-spacing:0;font-size:12px;width:100%}
+table.hmap{--position-width:240px;--work-width:44px;border-collapse:separate;border-spacing:0;
+  table-layout:fixed;font-size:12px;width:max(100%,calc(var(--position-width) + var(--visible-works) * var(--work-width)))}
 table.hmap th{background:var(--blue-l);position:sticky;top:0;z-index:5;border-bottom:2px solid var(--line);
   padding:3px;font-size:10.5px;color:var(--ink2)}
-table.hmap th.stick{left:0;z-index:8;text-align:left;min-width:200px;max-width:200px;background:var(--card);
+table.hmap th.stick{left:0;z-index:8;text-align:left;width:var(--position-width);background:var(--card);
   border-right:2px solid var(--line);padding:4px 8px;font-weight:600;position:sticky}
 table.hmap thead th.stick{z-index:12;background:var(--blue-l)}
 table.hmap tbody th.stick{cursor:pointer;transition:background-color .15s ease}
 table.hmap tbody th.stick:hover{background:var(--blue-l)}
 table.hmap th.stick b{display:block;font-size:12px;color:var(--ink2)}
 table.hmap th.stick span{display:block;font-size:10.5px;color:var(--dim);white-space:nowrap;overflow:hidden;
-  text-overflow:ellipsis;max-width:182px;font-weight:400}
+  text-overflow:ellipsis;font-weight:400}
 .vert{writing-mode:vertical-rl;transform:rotate(180deg);height:78px;margin:0 auto;white-space:nowrap;
   font-weight:600;overflow:hidden;text-overflow:ellipsis}
 td.c{width:44px;min-width:44px;height:44px;text-align:center;font-weight:700;font-size:11.5px;color:#20323f;
@@ -314,7 +331,7 @@ td.c.zero{background:#e9edf1;color:#aab3bd} td.c.na{background:#f7f8f9;cursor:de
 td.c.moved{box-shadow:inset 0 0 0 2px var(--navy2)}
 td.c.sel{box-shadow:inset 0 0 0 2px var(--org),inset 0 0 0 3px #fff}
 /* ---------- тепловая карта: физические показатели (факт/план в ячейке) ---------- */
-table.hmap.phys td.c{width:58px;min-width:58px}
+table.hmap.phys{--work-width:58px}
 td.c .cv{display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.12}
 td.c .cv b{font-size:11px;font-weight:800}
 td.c .cv i{font-size:8.6px;font-style:normal;font-weight:700;opacity:.68}
@@ -383,8 +400,6 @@ table.hmap tbody td.c:active,table.hmap tbody th.stick:active{transform:scale(.9
 /* ---------- анимации таблиц ---------- */
 .bar i.anim{transform-origin:left center;animation:barw .55s cubic-bezier(.22,.9,.3,1) backwards}
 @keyframes barw{from{transform:scaleX(0)}to{transform:scaleX(1)}}
-table.hmap tbody tr{animation:rowin .35s ease backwards}
-@keyframes rowin{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
 .kpi{animation:kin .4s ease backwards}
 @keyframes kin{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 .kpis .kpi:nth-child(2){animation-delay:60ms}.kpis .kpi:nth-child(3){animation-delay:120ms}
@@ -477,6 +492,9 @@ th.sorted .sar{opacity:1;color:var(--org)}
   .fl-per{display:none}
   .fgrp{gap:6px}
   .fgrp select{padding:6px 8px;font-size:12.5px}
+  .fgrp-period{width:100%}
+  .fgrp-period select{flex:1 1 0;min-width:0;max-width:none}
+  .fgrp-period .minib{padding-inline:7px}
   .fgrp-pk{margin-left:0;width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;
     margin-right:-12px;padding-right:12px}
   .fgrp-pk::-webkit-scrollbar{display:none}
@@ -485,8 +503,7 @@ th.sorted .sar{opacity:1;color:var(--org)}
   .card{padding:12px 13px;margin-bottom:12px}
   .kpis{grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
   .kv{font-size:22px}
-  table.hmap th.stick{min-width:150px;max-width:150px}
-  table.hmap th.stick span{max-width:132px}
+  table.hmap{--position-width:150px}
   .mapwrap{max-height:64vh}
   .viewsel{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin:0 -13px 12px;padding:0 13px}
   .viewsel::-webkit-scrollbar{display:none}
@@ -782,11 +799,11 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
     <button class="tab" data-tab="anomalii">Аномалии и риски</button>
   </div>
   <div class="sp"></div>
-  <div class="fgrp">
-    <span class="fl fl-per">Период (по снимкам):</span>
-    <select id="pFrom"></select><span class="fl">→</span><select id="pTo"></select>
+  <div class="fgrp fgrp-period">
+    <span class="fl fl-per">Период</span>
+    <select id="pFrom" aria-label="Начало периода"></select><span class="fl" aria-hidden="true">→</span><select id="pTo" aria-label="Конец периода"></select>
     <button class="minib" id="pQuick" title="Последний отчётный интервал">неделя</button>
-    <button class="minib" id="pAll" title="От первого снимка до последнего">всё</button>
+    <button class="minib" id="pAll" title="Все доступные даты">всё</button>
   </div>
   <div class="fgrp fgrp-pk">
     <span class="fl">ПК:</span>
@@ -799,13 +816,15 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
   <div class="drop-logo"><b>ТК</b><i>СМР</i><span><u></u><u></u><u></u><u></u></span></div>
   <div class="big">Дашборд выполнения СМР</div>
   <p>Загрузите книгу «Тепловая карта 2.x» — обзор, карта, кривая выполнения и риски рассчитаются автоматически. Файл обрабатывается прямо на устройстве и никуда не передаётся.</p>
-  <label class="btn drop-btn">Выбрать файл<input id="file" type="file" accept=".xlsm,.xlsx" hidden></label>
+  <label class="btn drop-btn">Выбрать файл<input class="file-input" id="file" type="file" aria-label="Выбрать книгу тепловой карты" accept=".xlsm,.xlsx"></label>
   <div class="drop-hint">или перетащите файл в это окно</div>
+  <p class="load-status" id="loadError" role="alert" hidden></p>
 </div>
 
-<div id="busy"><div class="spin"></div><div id="busyTxt">Чтение файла…</div></div>
+<div id="busy" role="status"><div class="spin"></div><div id="busyTxt">Чтение файла…</div></div>
 
 <main id="main" style="display:none">
+  <p class="load-status" id="replaceError" role="alert" hidden></p>
 
   <!-- ОБЗОР -->
   <div class="pane" id="pane-obzor">
@@ -826,18 +845,21 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
     <div class="card filecard">
       <div class="hm"><span>Отчётная дата книги</span><b id="rdate">—</b></div>
       <div class="hm"><span>Файл</span><b id="fname">—</b></div>
-      <label class="btn">Обновить из ТК<input id="file2" type="file" accept=".xlsm,.xlsx" hidden></label>
+      <label class="btn">Обновить из ТК<input class="file-input" id="file2" type="file" aria-label="Загрузить обновлённую книгу" accept=".xlsm,.xlsx"></label>
+      <p class="source-state" id="sourceState" role="status" hidden></p>
     </div>
   </div>
 
   <!-- ТЕПЛОВАЯ КАРТА -->
   <div class="pane" id="pane-karta" style="display:none">
     <div class="card">
-      <h2>Позиции генплана × виды работ <small id="mapCount"></small></h2>
+      <div class="map-topline"><h2>Позиции генплана × виды работ</h2><small id="mapCount" aria-live="polite"></small></div>
+      <div class="map-panel">
       <div class="maptools">
-        <input id="q" type="search" placeholder="Поиск по позиции или наименованию…">
-        <label class="chk"><input id="onlyLag" type="checkbox"> только с отставанием</label>
-        <label class="chk" title="Позиции, где за выбранный период изменился факт или план"><input id="onlyMoved" type="checkbox"> только с движением за период</label>
+        <input id="q" type="search" aria-label="Поиск позиции" placeholder="Номер или название позиции">
+        <label class="chk"><input id="onlyLag" type="checkbox"> С отставанием</label>
+        <label class="chk" title="Позиции, где за выбранный период изменился факт или план"><input id="onlyMoved" type="checkbox"> С изменениями</label>
+        <button type="button" class="minib" id="clearMap" disabled>Сбросить</button>
         <div class="seg seg3" id="mapModeSeg" data-active="pct">
           <i class="seg-thumb"></i>
           <button class="on" data-mode="pct">%</button>
@@ -847,8 +869,8 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
       </div>
       <div class="dim maphint" id="mapHint">в ячейке — % готовности от объёма по РД · нажмите на позицию, чтобы открыть карточку</div>
       <div class="viewsel" id="viewSel"></div>
+      </div>
       <div class="cellinfo" id="cellInfo"></div>
-      <div id="mapBox"></div>
       <div class="legend" id="legendDyn" hidden>
         <span><b style="font-size:13px">+12</b>&nbsp;прирост факта</span>
         <span style="opacity:.7">+10&nbsp;прирост плана</span>
@@ -865,6 +887,7 @@ html.sheet-open,html.sheet-open body{overflow:hidden}
         <span><i class="sw" style="background:#f7f8f9;border:1px solid #e3e7ea"></i>нет объёма</span>
         <span><i class="sw" style="box-shadow:inset 0 0 0 2px var(--navy2)"></i>есть прирост за период</span>
       </div>
+      <div id="mapBox"></div>
     </div>
   </div>
 
@@ -1064,6 +1087,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
         cPlanP: cT + 3, cFaktP: cT + 4, cDPlan: cT + 5, cDFakt: cT + 6
       });
     }
+    if (!views.length) throw new Error('В листе «Настройки» отсутствуют виды работ.');
 
     /* --- строки тепловой карты --- */
     var lastRow = 0, ref = tk['!ref'] ? XLSX.utils.decode_range(tk['!ref']) : null;
@@ -1086,7 +1110,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       if (!pos) { if (pks.indexOf(a) < 0) pks.push(a); continue; } // подзаголовок ПК
       rows.push({ row: rr, pk: a, pos: pos, name: str(gc(tk, rr, colName)), v: vals });
     }
-    if (!pks.length) rows.forEach(function (x) { if (pks.indexOf(x.pk) < 0) pks.push(x.pk); });
+    if (!rows.length) throw new Error('В листе «Тепловая карта» нет строк с позициями.');
+    rows.forEach(function (x) { if (pks.indexOf(x.pk) < 0) pks.push(x.pk); });
 
     /* --- история снимков: агрегаты по ПК + построчно по позициям --- */
     var histDates = [], histAgg = {}, histPos = {}, histTot = {};
@@ -1152,7 +1177,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       var gname = str(gc(stg, rg, 16));
       if (!gname) break;
       var blocksStr = str(gc(stg, rg, 17));
-      var idx = blocksStr.split(',').map(function (s) { return parseInt(s.trim(), 10) - 1; }).filter(function (n) { return n >= 0; });
+      var idx = blocksStr.split(',').map(function (s) { return Number(s.trim()) - 1; })
+        .filter(function (n, j, values) { return Number.isInteger(n) && n >= 0 && n < views.length && values.indexOf(n) === j; });
       if (idx.length) viewGroups.push({ name: gname, idx: idx });
     }
 
@@ -1169,8 +1195,9 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   /* ==== СРЕЗ НА ДАТУ: состояние на «to» + прирост от «from» ====
      Всего берётся из текущей ТК (объём по РД), План/Факт — из снимков Истории. */
   function sliceAt(m, fromKey, toKey) {
-    var lastKey = m.histDates.length ? dkey(m.histDates[m.histDates.length - 1]) : null;
-    var live = !toKey || toKey === lastKey;          // конец периода = последний снимок
+    var reportKey = dkey(m.reportDate);
+    var live = !toKey || toKey === reportKey;
+    var fromLive = fromKey === reportKey;
     var hTo = m.histPos[toKey], hFrom = m.histPos[fromKey];
     var rows = m.rows.map(function (r) {
       var key = r.pk + '‖' + r.pos;
@@ -1178,11 +1205,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       var v = m.views.map(function (vv, i) {
         var tot = r.v[i].tot;
         var plan, fakt;
-        if (a) { fakt = a[2 * i]; plan = a[2 * i + 1]; }
-        else if (live) { fakt = r.v[i].fakt; plan = r.v[i].plan; }
+        if (live) { fakt = r.v[i].fakt; plan = r.v[i].plan; }
+        else if (a) { fakt = a[2 * i]; plan = a[2 * i + 1]; }
         else { fakt = 0; plan = 0; }
-        var pf0 = b ? b[2 * i] : (hFrom ? 0 : fakt - r.v[i].dFakt);
-        var pp0 = b ? b[2 * i + 1] : (hFrom ? 0 : plan - r.v[i].dPlan);
+        var pf0 = fromLive ? r.v[i].fakt : b ? b[2 * i] : hFrom ? 0 : fakt;
+        var pp0 = fromLive ? r.v[i].plan : b ? b[2 * i + 1] : hFrom ? 0 : plan;
         return { tot: tot, plan: plan, fakt: fakt, dPlan: plan - pp0, dFakt: fakt - pf0 };
       });
       return { pk: r.pk, pos: r.pos, name: r.name, v: v };
@@ -1220,13 +1247,26 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     });
   }
 
-  /* серия по снимкам ТК: [{date, plan, fakt}] */
+  /* Серия по снимкам и текущему отчёту ТК. */
   function tkSeries(m, viewIdx, pk) {
     var key = viewIdx + '|' + (pk || PK_ALL);
-    return m.histDates.map(function (d) {
+    var reportKey = dkey(m.reportDate);
+    var series = m.histDates.filter(function (d) { return dkey(d) !== reportKey; }).map(function (d) {
       var b = m.histAgg[dkey(d)][key] || { f: 0, p: 0 };
       return { date: d, plan: b.p, fakt: b.f };
     });
+    if (m.reportDate) {
+      var current = { date: m.reportDate, plan: 0, fakt: 0 };
+      m.rows.forEach(function (r) {
+        if (pk && pk !== PK_ALL && r.pk !== pk) return;
+        if (!r.v[viewIdx]) return;
+        current.plan += r.v[viewIdx].plan;
+        current.fakt += r.v[viewIdx].fakt;
+      });
+      series.push(current);
+      series.sort(function (a, b) { return a.date - b.date; });
+    }
+    return series;
   }
 
   /* накопительный план из помесячных/понедельных приростов */
@@ -1364,18 +1404,41 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   }
 
   /* ================= ЗАГРУЗКА ================= */
+  var loading = false;
+  function loadError(message) {
+    var target = M ? $('#replaceError') : $('#loadError');
+    target.textContent = message;
+    target.hidden = !message;
+  }
   function readFile(file) {
+    if (loading) return;
+    loadError('');
+    if (!/\.(xlsm|xlsx)$/i.test(file.name)) {
+      loadError('Выберите сохранённую книгу «Тепловая карта» в формате .xlsm или .xlsx.');
+      return;
+    }
+    loading = true;
     setBusy(true, 'Чтение файла «' + file.name + '»…');
     var fr = new FileReader();
     fr.onload = function (e) {
       try {
         var wb = XLSX.read(new Uint8Array(e.target.result), { type: 'array', cellDates: false, cellStyles: false, bookVBA: false });
-        M = C.parse(wb); FILE = file.name;
-        try { localStorage.setItem('tk_model', JSON.stringify({ f: FILE, m: M })); } catch (x) { }
-        boot();
-      } catch (err) { setBusy(false); alert('Не удалось прочитать файл:\n' + err.message); }
+        var model = C.parse(wb);
+        if (!model.reportDate) throw new Error('В книге отсутствует корректная отчётная дата.');
+        M = model;
+        FILE = file.name;
+        var sourceMessage = '';
+        try {
+          localStorage.setItem('tk_model', JSON.stringify({ f: FILE, m: M }));
+        } catch (x) {
+          try { localStorage.removeItem('tk_model'); } catch (ignored) { }
+          sourceMessage = 'Браузер открыл книгу на текущий сеанс. После перезапуска загрузите её снова.';
+        }
+        boot(sourceMessage);
+      } catch (err) { loadError('Не удалось загрузить книгу. ' + err.message); }
     };
-    fr.onerror = function () { setBusy(false); alert('Ошибка чтения файла.'); };
+    fr.onerror = function () { loadError('Не удалось прочитать файл. Выберите его ещё раз.'); };
+    fr.onloadend = function () { loading = false; setBusy(false); };
     fr.readAsArrayBuffer(file);
   }
   function setBusy(on, msg) { var b = $('#busy'); b.style.display = on ? 'flex' : 'none'; if (msg) $('#busyTxt').textContent = msg; }
@@ -1388,23 +1451,32 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   }
 
   /* ================= ЗАПУСК ================= */
-  function boot() {
+  function boot(sourceMessage) {
     setBusy(false);
     $('#drop').style.display = 'none';
     document.documentElement.classList.remove('nodata');
     $('#main').style.display = '';
     $('#fname').textContent = FILE;
+    $('#fname').title = FILE;
     $('#rdate').textContent = C.fmtD(M.reportDate);
+    $('#sourceState').textContent = sourceMessage || '';
+    $('#sourceState').hidden = !sourceMessage;
     state.view = 0; state.dynView = 0; state.pk = C.PK_ALL; state.planSrc = 'ТК';
     state.sort = { col: null, dir: 1 }; state.full = true; state.viewGroup = null;
-    var hd = M.histDates;
-    state.to = hd.length ? hd[hd.length - 1] : M.reportDate;
-    state.from = hd.length > 1 ? hd[hd.length - 2] : (M.snapDate || state.to);
+    var hd = availableDates();
+    state.to = M.reportDate || hd[hd.length - 1];
+    state.from = hd[hd.indexOf(state.to) - 1] || state.to;
     ['#selView', '#dynView'].forEach(function (s) { var e = $(s); if (e) delete e.dataset.built; });
     buildPkSelector(); buildPeriodSelector(); buildViewSel();
     recalc(); render();
   }
   function recalc() { S = C.sliceAt(M, C.dkey(state.from), C.dkey(state.to)); }
+
+  function availableDates() {
+    var dates = new Map(M.histDates.map(function (d) { return [C.dkey(d), d]; }));
+    if (M.reportDate) dates.set(C.dkey(M.reportDate), M.reportDate);
+    return Array.from(dates.values()).sort(function (a, b) { return a - b; });
+  }
 
   function buildPkSelector() {
     var box = $('#pkSel'); box.innerHTML = '';
@@ -1422,9 +1494,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     allBtn.onclick = function () { state.viewGroup = null; buildViewSel(); renderKarta(); };
     box.appendChild(allBtn);
     (M.viewGroups || []).forEach(function (g) {
+      var indices = g.idx.filter(function (i) { return M.views[i]; });
+      if (!indices.length) return;
       var b = document.createElement('button');
       b.className = 'pkbtn' + (state.viewGroup === g ? ' on' : ''); b.textContent = g.name;
-      b.title = g.idx.map(function (i) { return M.views[i] ? M.views[i].name : ''; }).join(', ');
+      b.title = indices.map(function (i) { return M.views[i].name; }).join(', ');
       b.onclick = function () {
         state.viewGroup = state.viewGroup === g ? null : g;
         buildViewSel(); renderKarta();
@@ -1434,8 +1508,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   }
   function buildPeriodSelector() {
     var f = $('#pFrom'), t = $('#pTo');
-    var opts = M.histDates.map(function (d) { return '<option value="' + C.dkey(d) + '">' + C.fmtD(d) + '</option>'; }).join('');
+    var hd = availableDates();
+    var opts = hd.map(function (d) {
+      return '<option value="' + C.dkey(d) + '">' + C.fmtD(d) + '</option>';
+    }).join('');
     f.innerHTML = opts; t.innerHTML = opts;
+    f.disabled = t.disabled = $('#pQuick').disabled = $('#pAll').disabled = hd.length < 2;
     f.value = C.dkey(state.from); t.value = C.dkey(state.to);
     f.onchange = function () {
       state.from = new Date(f.value);
@@ -1448,13 +1526,12 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       recalc(); render();
     };
     $('#pQuick').onclick = function () {
-      var hd = M.histDates;
       state.to = hd[hd.length - 1]; state.from = hd.length > 1 ? hd[hd.length - 2] : state.to;
       f.value = C.dkey(state.from); t.value = C.dkey(state.to);
       recalc(); render();
     };
     $('#pAll').onclick = function () {
-      state.from = M.histDates[0]; state.to = M.histDates[M.histDates.length - 1];
+      state.from = hd[0]; state.to = hd[hd.length - 1];
       f.value = C.dkey(state.from); t.value = C.dkey(state.to);
       recalc(); render();
     };
@@ -1486,9 +1563,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     $$('.pane').forEach(function (p) { p.style.display = p.id === 'pane-' + state.tab ? '' : 'none'; });
     $('#pageTitle').textContent = $('#pageTitleMini').textContent = TAB_TITLES[state.tab] || 'ТК СМР';
     placeLens();
-    var lastKey = C.dkey(M.histDates[M.histDates.length - 1]);
-    $('#tmach').style.display = C.dkey(state.to) === lastKey ? 'none' : '';
-    $('#tmach').textContent = 'Ретроспективный просмотр: показано состояние на ' + C.fmtD(state.to) + ', а не на отчётную дату книги.';
+    $('#tmach').style.display = C.dkey(state.to) === C.dkey(M.reportDate) ? 'none' : '';
+    $('#tmach').textContent = 'Состояние по снимку на ' + C.fmtD(state.to) + '. Отчётная дата книги — ' + C.fmtD(M.reportDate) + '.';
     ({ obzor: renderObzor, karta: renderKarta, krivaya: renderKrivaya, dinamika: renderDinamika, anomalii: renderAnomalii })[state.tab]();
   }
 
@@ -1889,17 +1965,21 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   /* ================= ТЕПЛОВАЯ КАРТА ================= */
   function renderKarta() {
     var rows = S.rows.filter(function (r) { return state.pk === C.PK_ALL || r.pk === state.pk; });
-    if (state.q) {
-      var q = state.q.toLowerCase();
-      rows = rows.filter(function (r) { return (r.pos + ' ' + r.name).toLowerCase().indexOf(q) >= 0; });
+    var rowCount = rows.length;
+    var visIdx = state.viewGroup ? state.viewGroup.idx.filter(function (i) { return M.views[i]; }) : M.views.map(function (v, i) { return i; });
+    var q = state.q.trim().toLowerCase();
+    if (q) {
+      rows = rows.filter(function (r) { return (r.pos + ' ' + r.name).toLowerCase().includes(q); });
     }
-    if (state.onlyLag) rows = rows.filter(function (r) { return r.v.some(function (c) { return c.tot > 0 && c.fakt < c.plan - 1e-9; }); });
-    var visIdx = state.viewGroup ? state.viewGroup.idx : M.views.map(function (v, i) { return i; });
+    if (state.onlyLag) rows = rows.filter(function (r) {
+      return visIdx.some(function (i) { var c = r.v[i]; return c.tot > 0 && c.fakt < c.plan - 1e-9; });
+    });
     if (state.onlyMoved) rows = rows.filter(function (r) {
       return visIdx.some(function (i) { var c = r.v[i]; return Math.abs(c.dFakt) > 1e-9 || Math.abs(c.dPlan) > 1e-9; });
     });
     kartaRows = rows;
     $('#cellInfo').innerHTML = '';
+    $('#clearMap').disabled = !(state.q || state.onlyLag || state.onlyMoved || state.viewGroup);
     var dyn = state.mapMode === 'dyn';
     $('#legendDyn').hidden = !dyn; $('#legendMain').hidden = dyn;
     $('#mapHint').textContent = dyn
@@ -1910,11 +1990,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
     var phys = state.mapMode === 'phys';
 
-    var h = ['<div class="mapwrap"><table class="hmap' + (phys || dyn ? ' phys' : '') + '"><thead><tr><th class="stick l">Позиция</th>'];
+    var h = ['<div class="mapwrap" role="region" tabindex="0" aria-label="Таблица тепловой карты"><table style="--visible-works:' +
+      visIdx.length + '" class="hmap' + (phys || dyn ? ' phys' : '') + '"><thead><tr><th class="stick l" scope="col">Позиция</th>'];
     visIdx.forEach(function (i) { var v = M.views[i]; h.push('<th title="' + esc(v.name) + '"><div class="vert">' + esc(abbrView(v.short)) + '</div></th>'); });
     h.push('</tr></thead><tbody>');
     rows.forEach(function (r, ri) {
-      h.push('<tr style="animation-delay:' + Math.min(ri * 9, 500) + 'ms"><th class="stick l" data-ri="' + ri + '" title="Нажмите, чтобы выделить позицию"><b>' + esc(r.pos) + '</b><span>' + esc(r.name) + '</span></th>');
+      var newPk = ri > 0 && r.pk !== rows[ri - 1].pk;
+      var pkLabel = state.pk === C.PK_ALL ? '<span class="map-pk">' + esc(r.pk) + '</span>' : '';
+      h.push('<tr class="' + (newPk ? 'maprow-gap' : '') + '"><th class="stick l" scope="row" data-ri="' + ri +
+        '" title="' + esc(r.name) + '"><b>' + esc(r.pos) + pkLabel + '</b><span>' + esc(r.name) + '</span></th>');
       visIdx.forEach(function (i) {
         var c = r.v[i];
         var st = statusOf(c.fakt, c.plan, c.tot), rd = c.tot ? c.fakt / c.tot : 0;
@@ -1938,8 +2022,8 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
       h.push('</tr>');
     });
     h.push('</tbody></table></div>');
-    $('#mapBox').innerHTML = rows.length ? h.join('') : '<div class="empty">Под выбранные условия позиций нет. Измените период или снимите отметку.</div>';
-    $('#mapCount').textContent = rows.length + ' поз. · состояние на ' + C.fmtD(state.to);
+    $('#mapBox').innerHTML = rows.length ? h.join('') : '<div class="empty">Позиции не найдены. Сбросьте фильтры карты или выберите другой ПК и период.</div>';
+    $('#mapCount').textContent = rows.length + ' из ' + rowCount + ' поз. · ' + C.fmtD(state.to);
   }
 
   /* короткие подписи колонок тепловой карты (полное название — в подсказке и карточке позиции) */
@@ -2038,7 +2122,7 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
   /* ================= КРИВАЯ ================= */
   function viewOptions() {
     var o = M.views.map(function (v, i) { return { i: i, name: v.name }; });
-    o.push({ i: -1, name: 'ЗРА (суммарно), шт' });
+    if (M.views.length >= 8) o.push({ i: -1, name: 'ЗРА (суммарно), шт' });
     return o;
   }
   function factSeries(vi, pk) {
@@ -2545,8 +2629,13 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
 
   /* ================= СОБЫТИЯ ================= */
   document.addEventListener('DOMContentLoaded', function () {
-    $('#file').onchange = function (e) { if (e.target.files[0]) readFile(e.target.files[0]); };
-    $('#file2').onchange = function (e) { if (e.target.files[0]) readFile(e.target.files[0]); };
+    ['#file', '#file2'].forEach(function (id) {
+      $(id).onchange = function () {
+        var file = this.files[0];
+        this.value = '';
+        if (file) readFile(file);
+      };
+    });
     var dz = $('#drop');
     ['dragenter', 'dragover'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); dz.classList.add('hot'); }); });
     ['dragleave', 'drop'].forEach(function (t) { document.addEventListener(t, function (e) { e.preventDefault(); dz.classList.remove('hot'); }); });
@@ -2555,6 +2644,15 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     $('#q').oninput = function () { state.q = this.value; if (state.tab === 'karta') renderKarta(); };
     $('#onlyLag').onchange = function () { state.onlyLag = this.checked; renderKarta(); };
     $('#onlyMoved').onchange = function () { state.onlyMoved = this.checked; renderKarta(); };
+    $('#clearMap').onclick = function () {
+      state.q = $('#q').value = '';
+      state.onlyLag = $('#onlyLag').checked = false;
+      state.onlyMoved = $('#onlyMoved').checked = false;
+      state.viewGroup = null;
+      buildViewSel();
+      renderKarta();
+      $('#q').focus();
+    };
     (function () {
       var nav = $('#bottomNav'), lens = $('#navLens'), btns = $$('#bottomNav .navbtn');
       var hot = null, sx = 0, moved = false, pid = null;
@@ -2703,7 +2801,11 @@ var o=[];var l=Array.isArray(e);for(f=n.s.c;f<=n.e.c;++f)s[f]=ya(f);for(var c=n.
     });
     try {
       var saved = JSON.parse(localStorage.getItem('tk_model') || 'null');
-      if (saved && saved.m) { M = revive(saved.m); FILE = saved.f + '  (сохранённая копия)'; boot(); }
+      if (saved && saved.m && saved.m.rows.length && saved.m.views.length) {
+        M = revive(saved.m);
+        FILE = saved.f;
+        boot('Открыта последняя книга, сохранённая в этом браузере.');
+      }
     } catch (x) { }
   });
 })();

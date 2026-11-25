@@ -1,6 +1,6 @@
 {
-  "name": "ТК СМР β",
-  "short_name": "ТК СМР β",
+  "name": "ТК СМР",
+  "short_name": "ТК СМР",
   "description": "Дашборд выполнения СМР по книге «Тепловая карта»",
   "start_url": "./index.html",
   "scope": "./",
